@@ -1,4 +1,4 @@
-# Access All Data Visualization in DFP
+# Informal Economy Viz in DFP
 
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app) and uses [Craco](https://www.npmjs.com/package/@craco/craco) to add a configuration layer for CRA. For this porject, we use [Typescript](https://www.typescriptlang.org/), a strongly typed programming language that builds on JavaScript. Typescript helps in better documentation of the code and communication between developers.
 
@@ -11,8 +11,8 @@ To install the project, sinply clone the the repo and them run `npm install` in 
 Run the terminal or command prompt and then run the following
 
 ```
-git clone https://github.com/UNDP-Data/Access-All-Data-Viz.git
-cd Access-All-Data-Viz
+git clone https://github.com/UNDP-Data/Informal-Economy-Viz.git
+cd Informal-Economy-Viz
 npm install
 ```
 ### Local Development
