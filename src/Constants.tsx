@@ -4,13 +4,13 @@ export const MAX_TEXT_LENGTH = 100;
 
 export const TRUNCATE_MAX_TEXT_LENGTH = 125;
 
-export const EMBED_LINK_ROOT = 'https://data.undp.org/access-all-data-viz-v2/';
+export const EMBED_LINK_ROOT = 'https://data.undp.org/informal-economy-viz-v2/';
 
-export const PARENT_LINK_ROOT = 'https://data.undp.org/explore-all-data/';
+export const PARENT_LINK_ROOT = 'https://data.undp.org/informal-economy/';
 
 export const DEFAULT_VALUES = {
-  firstMetric: 'GDP per capita, PPP (current international $)',
-  secondMetric: 'Human development index (HDI)',
+  firstMetric: 'Informal employment by sex and age (thousands), Male, 15+',
+  secondMetric: 'Informal employment by sex and age (thousands), Female, 15+',
   colorMetric: 'Continents',
 };
 
@@ -162,3 +162,11 @@ export const COLOR_SCALES = {
     ['#F782A5', '#D180B3', '#9F7DC5', '#727AD4', '#4978E3'],
   ],
 };
+
+export const WBIndicators = [
+  'Employment outside the formal sector (% of total employment; International Labour Organization; hamonized series)',
+  'Dynamic general equilibrium model-based (DGE) estimates of informal output (% of official GDP)',
+  'Percent of firms competing against unregistered or informal firms (World Bank Enterprise Surveys)',
+  'Percent of firms formally registered when they started operations in the country (World Bank Enterprise Surveys)',
+  'Number of years firm operated without formal registration (World Bank Enterprise Surveys)',
+];

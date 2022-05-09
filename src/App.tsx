@@ -15,6 +15,8 @@ import { GrapherComponent } from './GrapherComponent';
 import Reducer from './Context/Reducer';
 import Context from './Context/Context';
 import { DEFAULT_VALUES } from './Constants';
+import ILOData from './Data/ILOData.json';
+import WBData from './Data/WBFinalData.json';
 
 const GlobalStyle = createGlobalStyle`
   :root {
@@ -181,6 +183,14 @@ const VizAreaEl = styled.div`
   height: 10rem;
 `;
 
+const WBIndicators = [
+  'Employment outside the formal sector (% of total employment; International Labour Organization; hamonized series)',
+  'Dynamic general equilibrium model-based (DGE) estimates of informal output (% of official GDP)',
+  'Percent of firms competing against unregistered or informal firms (World Bank Enterprise Surveys)',
+  'Percent of firms formally registered when they started operations in the country (World Bank Enterprise Surveys)',
+  'Number of years firm operated without formal registration (World Bank Enterprise Surveys)',
+];
+
 const App = () => {
   const [finalData, setFinalData] = useState<DataType[] | undefined>(undefined);
   const [indicatorsList, setIndicatorsList] = useState<IndicatorMetaDataWithYear[] | undefined>(undefined);
@@ -337,7 +347,7 @@ const App = () => {
   useEffect(() => {
     queue()
       .defer(json, './data/ALL-DATA.json')
-      .defer(json, 'https://raw.githubusercontent.com/UNDP-Data/Indicators-MetaData/main/indicatorMetaData.json')
+      .defer(json, 'https://raw.githubusercontent.com/UNDP-Data/InformalEconomy-Indicator-MetaData/main/indicatorMetaData.json')
       .defer(json, 'https://raw.githubusercontent.com/UNDP-Data/Country-Taxonomy/main/country-territory-groups.json')
       .await((err: any, data: any[], indicatorMetaData: IndicatorMetaDataType[], countryGroupData: CountryGroupDataType[]) => {
         if (err) throw err;
@@ -398,9 +408,54 @@ const App = () => {
             indicators: indTemp,
           });
         });
+        ILOData.forEach((d) => {
+          if (countryData.findIndex((el) => el['Country or Area'] === d['Country or Area']) !== -1) {
+            d.indicators.forEach((indicator) => {
+              countryData[countryData.findIndex((el) => el['Country or Area'] === d['Country or Area'])].indicators.push(indicator);
+              countryData[countryData.findIndex((el) => el['Country or Area'] === d['Country or Area'])].indicatorAvailable.push(indicator.indicator);
+            });
+          } else {
+            // eslint-disable-next-line no-console
+            console.log(d['Country or Area']);
+          }
+        });
+        WBData.forEach((d) => {
+          if (countryData.findIndex((el) => el['Alpha-3 code-1'] === d['Country or Area']) !== -1) {
+            d.indicators.forEach((indicator) => {
+              countryData[countryData.findIndex((el) => el['Alpha-3 code-1'] === d['Country or Area'])].indicators.push(indicator);
+              countryData[countryData.findIndex((el) => el['Alpha-3 code-1'] === d['Country or Area'])].indicatorAvailable.push(indicator.indicator);
+            });
+          } else {
+            // eslint-disable-next-line no-console
+            console.log(d['Country or Area']);
+          }
+        });
         setFinalData(countryData);
         setCountryList(countryData.map((d) => d['Country or Area']));
         setRegionList(uniqBy(countryData, (d) => d['Group 2']).map((d) => d['Group 2']));
+        ILOData[0].indicators.forEach((d) => {
+          const yearlyData = d.yearAvailable.map((el) => ({
+            year: el,
+            value: undefined,
+          }));
+          countryIndicatorObj.push({ ...d, yearlyData });
+        });
+        WBIndicators.forEach((d) => {
+          const yearAvailable: number[] = [];
+          for (let i = 1990; i < 2019; i += 1) {
+            yearAvailable.push(i);
+          }
+          const yearlyData = yearAvailable.map((el) => ({
+            year: el,
+            value: undefined,
+          }));
+          const obj = {
+            indicator: d,
+            yearAvailable,
+            yearlyData,
+          };
+          countryIndicatorObj.push(obj);
+        });
         const indicatorWithYears: IndicatorMetaDataWithYear[] = indicatorMetaData.map((d) => ({
           ...d,
           years: countryIndicatorObj[countryIndicatorObj.findIndex((el) => el.indicator === d.DataKey)].yearAvailable,
