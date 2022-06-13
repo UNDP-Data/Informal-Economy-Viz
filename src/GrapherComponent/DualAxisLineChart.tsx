@@ -112,8 +112,8 @@ export const DualAxisLineChart = (props: Props) => {
   for (let i = minYear; i < maxYear + 1; i += 1) {
     dataFormatted.push({
       year: i,
-      param1: countryData?.indicators[xIndicatorIndex].yearlyData[countryData?.indicators[xIndicatorIndex].yearlyData.findIndex((d) => d.year === i)]?.value,
-      param2: countryData?.indicators[yIndicatorIndex].yearlyData[countryData?.indicators[yIndicatorIndex].yearlyData.findIndex((d) => d.year === i)]?.value,
+      param1: countryData?.indicators[xIndicatorIndex]?.yearlyData[countryData?.indicators[xIndicatorIndex].yearlyData.findIndex((d) => d.year === i)]?.value,
+      param2: countryData?.indicators[yIndicatorIndex]?.yearlyData[countryData?.indicators[yIndicatorIndex].yearlyData.findIndex((d) => d.year === i)]?.value,
     });
   }
   const minParam1: number = minBy(dataFormatted, (d) => d.param1)?.param1 ? minBy(dataFormatted, (d) => d.param1)?.param1 as number > 0 ? 0 : minBy(dataFormatted, (d) => d.param1)?.param1 as number : 0;

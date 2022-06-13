@@ -107,7 +107,7 @@ export const LineChart = (props: Props) => {
   for (let i = minYear; i < maxYear + 1; i += 1) {
     dataFormatted.push({
       year: i,
-      param: countryData?.indicators[xIndicatorIndex].yearlyData[countryData?.indicators[xIndicatorIndex].yearlyData.findIndex((d) => d.year === i)]?.value,
+      param: countryData?.indicators[xIndicatorIndex]?.yearlyData[countryData?.indicators[xIndicatorIndex].yearlyData.findIndex((d) => d.year === i)]?.value,
     });
   }
   const minParam: number = minBy(dataFormatted, (d) => d.param)?.param ? minBy(dataFormatted, (d) => d.param)?.param as number > 0 ? 0 : minBy(dataFormatted, (d) => d.param)?.param as number : 0;

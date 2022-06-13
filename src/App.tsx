@@ -14,7 +14,7 @@ import {
 import { GrapherComponent } from './GrapherComponent';
 import Reducer from './Context/Reducer';
 import Context from './Context/Context';
-import { DEFAULT_VALUES } from './Constants';
+import { DEFAULT_VALUES, DATASOURCELINK } from './Constants';
 import ILOData from './Data/ILOData.json';
 import WBData from './Data/WBFinalData.json';
 
@@ -346,7 +346,7 @@ const App = () => {
 
   useEffect(() => {
     queue()
-      .defer(json, 'https://data.undp.org/pillar-insights/data/ALL-DATA.json')
+      .defer(json, `${DATASOURCELINK}/data/ALL-DATA.json`)
       .defer(json, 'https://raw.githubusercontent.com/UNDP-Data/InformalEconomy-Indicator-MetaData/main/indicatorMetaData.json')
       .defer(json, 'https://raw.githubusercontent.com/UNDP-Data/Country-Taxonomy/main/country-territory-groups.json')
       .await((err: any, data: any[], indicatorMetaData: IndicatorMetaDataType[], countryGroupData: CountryGroupDataType[]) => {

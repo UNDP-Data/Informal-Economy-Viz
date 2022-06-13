@@ -170,3 +170,5 @@ export const WBIndicators = [
   'Percent of firms formally registered when they started operations in the country (World Bank Enterprise Surveys)',
   'Number of years firm operated without formal registration (World Bank Enterprise Surveys)',
 ];
+
+export const DATASOURCELINK = 'https://data.undp.org/pillar-insights';
