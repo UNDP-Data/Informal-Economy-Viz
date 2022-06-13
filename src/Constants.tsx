@@ -9,8 +9,8 @@ export const EMBED_LINK_ROOT = 'https://informal-economy.netlify.app/';
 export const PARENT_LINK_ROOT = 'https://data.undp.org/informal-economy/';
 
 export const DEFAULT_VALUES = {
-  firstMetric: 'Informal employment by sex and age (thousands), Male, 15+',
-  secondMetric: 'Informal employment by sex and age (thousands), Female, 15+',
+  firstMetric: 'Informal employment by sex and age (thousands), Male, 15 and above',
+  secondMetric: 'Informal employment by sex and age (thousands), Female, 15 and above',
   colorMetric: 'Continents',
 };
 
