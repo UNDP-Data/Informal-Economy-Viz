@@ -166,8 +166,8 @@ export const UnivariateMap = (props: Props) => {
               const index = (World as any).features.findIndex((el: any) => d['Alpha-3 code-1'] === el.properties.ISO3);
               const indicatorIndex = d.indicators.findIndex((el) => xIndicatorMetaData.DataKey === el.indicator);
               const val = indicatorIndex === -1 ? undefined
-                : year !== -1 && !showMostRecentData ? d.indicators[indicatorIndex].yearlyData[d.indicators[indicatorIndex].yearlyData.findIndex((el) => el.year === year)]?.value
-                  : d.indicators[indicatorIndex].yearlyData[d.indicators[indicatorIndex].yearlyData.length - 1]?.value;
+                : year !== -1 && !showMostRecentData ? d.indicators[indicatorIndex]?.yearlyData[d.indicators[indicatorIndex]?.yearlyData.findIndex((el) => el.year === year)]?.value
+                  : d.indicators[indicatorIndex]?.yearlyData[d.indicators[indicatorIndex]?.yearlyData.length - 1]?.value;
               const color = val !== undefined ? colorScale(xIndicatorMetaData.IsCategorical ? Math.floor(val) : val) : COLOR_SCALES.Null;
 
               const regionOpacity = selectedRegions.length === 0 || selectedRegions.indexOf(d['Group 2']) !== -1;
@@ -180,7 +180,7 @@ export const UnivariateMap = (props: Props) => {
                   title: xAxisIndicator,
                   value: val === undefined ? 'NA' : val,
                   type: 'color',
-                  year: year === -1 || showMostRecentData ? d.indicators[indicatorIndex].yearlyData[d.indicators[indicatorIndex].yearlyData.length - 1]?.year : year,
+                  year: year === -1 || showMostRecentData ? d.indicators[indicatorIndex]?.yearlyData[d.indicators[indicatorIndex]?.yearlyData.length - 1]?.year : year,
                   color,
                   prefix: xIndicatorMetaData?.LabelPrefix,
                   suffix: xIndicatorMetaData?.LabelSuffix,
@@ -189,15 +189,15 @@ export const UnivariateMap = (props: Props) => {
               if (sizeIndicatorMetaData) {
                 const sizeIndicatorIndex = d.indicators.findIndex((el) => sizeIndicatorMetaData?.DataKey === el.indicator);
                 const sizeVal = sizeIndicatorIndex === -1 ? undefined
-                  : year !== -1 && !showMostRecentData ? d.indicators[sizeIndicatorIndex].yearlyData[d.indicators[sizeIndicatorIndex].yearlyData.findIndex((el) => el.year === year)]?.value
-                    : d.indicators[sizeIndicatorIndex].yearlyData[d.indicators[sizeIndicatorIndex].yearlyData.length - 1]?.value;
+                  : year !== -1 && !showMostRecentData ? d.indicators[sizeIndicatorIndex]?.yearlyData[d.indicators[sizeIndicatorIndex]?.yearlyData.findIndex((el) => el.year === year)]?.value
+                    : d.indicators[sizeIndicatorIndex]?.yearlyData[d.indicators[sizeIndicatorIndex]?.yearlyData.length - 1]?.value;
                 rowData.push({
                   title: sizeIndicator,
                   value: sizeVal !== undefined ? sizeVal : 'NA',
                   type: 'size',
                   prefix: sizeIndicatorMetaData?.LabelPrefix,
                   suffix: sizeIndicatorMetaData?.LabelSuffix,
-                  year: year === -1 || showMostRecentData ? d.indicators[sizeIndicatorIndex].yearlyData[d.indicators[sizeIndicatorIndex].yearlyData.length - 1]?.year : year,
+                  year: year === -1 || showMostRecentData ? d.indicators[sizeIndicatorIndex]?.yearlyData[d.indicators[sizeIndicatorIndex]?.yearlyData.length - 1]?.year : year,
                 });
               }
               return (
@@ -352,7 +352,7 @@ export const UnivariateMap = (props: Props) => {
                         title: xAxisIndicator,
                         value: val === undefined ? 'NA' : val,
                         type: 'color',
-                        year: year === -1 || showMostRecentData ? d.indicators[indicatorIndex].yearlyData[d.indicators[indicatorIndex].yearlyData.length - 1]?.year : year,
+                        year: year === -1 || showMostRecentData ? d.indicators[indicatorIndex]?.yearlyData[d.indicators[indicatorIndex]?.yearlyData.length - 1]?.year : year,
                         color,
                         prefix: xIndicatorMetaData?.LabelPrefix,
                         suffix: xIndicatorMetaData?.LabelSuffix,
@@ -365,7 +365,7 @@ export const UnivariateMap = (props: Props) => {
                         type: 'size',
                         prefix: sizeIndicatorMetaData?.LabelPrefix,
                         suffix: sizeIndicatorMetaData?.LabelSuffix,
-                        year: year === -1 || showMostRecentData ? d.indicators[sizeIndicatorIndex].yearlyData[d.indicators[sizeIndicatorIndex].yearlyData.length - 1]?.year : year,
+                        year: year === -1 || showMostRecentData ? d.indicators[sizeIndicatorIndex]?.yearlyData[d.indicators[sizeIndicatorIndex]?.yearlyData.length - 1]?.year : year,
                       });
                     }
                     return (
