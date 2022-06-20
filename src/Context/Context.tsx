@@ -2,12 +2,12 @@ import { createContext } from 'react';
 import { CtxDataType } from '../Types';
 
 const Context = createContext<CtxDataType>({
-  graphType: 'map',
+  graphType: 'scatterPlot',
   selectedRegions: [],
   selectedCountries: [],
   selectedIncomeGroups: [],
   selectedCountryGroup: 'All',
-  showMostRecentData: false,
+  showMostRecentData: true,
   year: 2021,
   xAxisIndicator: '',
   yAxisIndicator: '',

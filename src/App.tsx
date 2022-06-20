@@ -198,7 +198,7 @@ const App = () => {
   const [countryList, setCountryList] = useState<string[] | undefined>(undefined);
   const queryParams = new URLSearchParams(window.location.search);
   const initialState = {
-    graphType: queryParams.get('graphType') || 'map',
+    graphType: queryParams.get('graphType') || 'scatterPlot',
     selectedRegions: queryParams.get('regions')?.split('~') || [],
     selectedCountries: queryParams.get('countries')?.split('~') || [],
     selectedIncomeGroups: queryParams.get('incomeGroups')?.split('~') || [],
@@ -208,7 +208,7 @@ const App = () => {
     yAxisIndicator: queryParams.get('secondMetric') || DEFAULT_VALUES.secondMetric,
     colorIndicator: queryParams.get('colorMetric') || DEFAULT_VALUES.colorMetric,
     sizeIndicator: queryParams.get('sizeMetric') || undefined,
-    showMostRecentData: queryParams.get('showMostRecentData') === 'true',
+    showMostRecentData: queryParams.get('showMostRecentData') !== 'false',
     showLabel: queryParams.get('showLabel') === 'true',
     showSource: false,
     trendChartCountry: queryParams.get('trendChartCountry') || undefined,
