@@ -171,4 +171,4 @@ export const WBIndicators = [
   'Number of years firm operated without formal registration (World Bank Enterprise Surveys)',
 ];
 
-export const DATASOURCELINK = 'https://data.undp.org/pillar-insights';
+export const DATASOURCELINK = process.env.NODE_ENV === 'production' ? 'https://data.undp.org/pillar-insights' : '.';

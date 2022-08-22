@@ -17,6 +17,7 @@ import Context from './Context/Context';
 import { DEFAULT_VALUES, DATASOURCELINK } from './Constants';
 import ILOData from './Data/ILOData.json';
 import WBData from './Data/WBFinalData.json';
+import { DonutChartCard } from './Components/DonutChartCard';
 
 const GlobalStyle = createGlobalStyle`
   :root {
@@ -181,6 +182,34 @@ const VizAreaEl = styled.div`
   align-items: center;
   justify-content: center;
   height: 10rem;
+`;
+
+const CardContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  width: 100%;
+  max-width: 128rem;
+  margin: auto;
+`;
+
+const CardEl = styled.div`
+  width: calc(33% - 1rem);
+  color: #110848;
+  text-align: center;
+  font-weight: bold;
+  background-color: #f3f7fe;
+  padding: 2rem;
+  @media (max-width: 560px) {
+    width: 100%;
+    margin-bottom: 2rem;
+  }  
+`;
+
+const DataPointEl = styled.div`
+  font-weight: bold;
+  font-size: 4.8rem;
+  margin: 6rem 0 0 0;
 `;
 
 const WBIndicators = [
@@ -466,6 +495,31 @@ const App = () => {
   return (
     <>
       <GlobalStyle />
+      <CardContainer>
+        <CardEl>
+          Informal economy absorbs
+          <DonutChartCard
+            data={80}
+          />
+          of enterprises in the world
+        </CardEl>
+        <CardEl>
+          People working in the informal economy
+          <DataPointEl>
+            2 Billion
+          </DataPointEl>
+        </CardEl>
+        <CardEl>
+          Percentage of the
+          {' '}
+          {'world\'s'}
+          {' '}
+          employed population in the informal economy
+          <DonutChartCard
+            data={60}
+          />
+        </CardEl>
+      </CardContainer>
       {
         indicatorsList && finalData && regionList && countryList
           ? (
