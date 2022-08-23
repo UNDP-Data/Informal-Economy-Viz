@@ -18,6 +18,7 @@ import { DEFAULT_VALUES, DATASOURCELINK } from './Constants';
 import ILOData from './Data/ILOData.json';
 import WBData from './Data/WBFinalData.json';
 import { DonutChartCard } from './Components/DonutChartCard';
+import { MultiDonutChartCard } from './Components/MultiDonutChartCard';
 
 const GlobalStyle = createGlobalStyle`
   :root {
@@ -206,10 +207,30 @@ const CardEl = styled.div`
   }  
 `;
 
+const CardFullWidthEl = styled.div`
+  width: 100%;
+  max-width: 128rem;
+  color: #110848;
+  text-align: center;
+  font-weight: bold;
+  background-color: #f3f7fe;
+  padding: 2rem;
+  margin: 2rem auto 0 auto;
+  @media (max-width: 560px) {
+    margin: 0 auto 0 auto;
+  }  
+`;
+
 const DataPointEl = styled.div`
   font-weight: bold;
   font-size: 4.8rem;
   margin: 6rem 0 0 0;
+`;
+
+const MultiDonutEl = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: space-between;
 `;
 
 const WBIndicators = [
@@ -520,6 +541,35 @@ const App = () => {
           />
         </CardEl>
       </CardContainer>
+      <CardFullWidthEl>
+        Share of informal employment in total employment by:
+        <MultiDonutEl>
+          <MultiDonutChartCard
+            data={[66, 58.1]}
+            keys={['Male', 'Female']}
+            colors={['#00C4AA', '#8700F9']}
+            titleText='Gender'
+          />
+          <MultiDonutChartCard
+            data={[77.1, 58.7]}
+            keys={['15-24 Yrs', '25+ Yrs']}
+            titleText='Age'
+            colors={['#41b6c4', '#253494']}
+          />
+          <MultiDonutChartCard
+            data={[93.8, 84.6, 51.7, 23.8]}
+            keys={['No Edu.', 'Primary', 'Secondary', 'Tertiary']}
+            titleText='Education'
+            colors={['#d7191c', '#fdae61', '#abdda4', '#2b83ba']}
+          />
+          <MultiDonutChartCard
+            data={[80, 43.7]}
+            keys={['Rural', 'Urban']}
+            titleText='Area of Residence'
+            colors={['#4daf4a', '#377eb8']}
+          />
+        </MultiDonutEl>
+      </CardFullWidthEl>
       {
         indicatorsList && finalData && regionList && countryList
           ? (
