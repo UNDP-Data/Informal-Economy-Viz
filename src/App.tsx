@@ -516,101 +516,115 @@ const App = () => {
   return (
     <>
       <GlobalStyle />
-      <CardContainer>
-        <CardEl>
-          Informal economy absorbs
-          <DonutChartCard
-            data={80}
-          />
-          of enterprises in the world
-        </CardEl>
-        <CardEl>
-          People working in the informal economy
-          <DataPointEl>
-            2 Billion
-          </DataPointEl>
-        </CardEl>
-        <CardEl>
-          Percentage of the
-          {' '}
-          {'world\'s'}
-          {' '}
-          employed population in the informal economy
-          <DonutChartCard
-            data={60}
-          />
-        </CardEl>
-      </CardContainer>
-      <CardFullWidthEl>
-        Share of informal employment in total employment by:
-        <MultiDonutEl>
-          <MultiDonutChartCard
-            data={[66, 58.1]}
-            keys={['Male', 'Female']}
-            colors={['#00C4AA', '#8700F9']}
-            titleText='Gender'
-          />
-          <MultiDonutChartCard
-            data={[77.1, 58.7]}
-            keys={['15-24 Yrs', '25+ Yrs']}
-            titleText='Age'
-            colors={['#41b6c4', '#253494']}
-          />
-          <MultiDonutChartCard
-            data={[93.8, 84.6, 51.7, 23.8]}
-            keys={['No Edu.', 'Primary', 'Secondary', 'Tertiary']}
-            titleText='Education'
-            colors={['#d7191c', '#fdae61', '#abdda4', '#2b83ba']}
-          />
-          <MultiDonutChartCard
-            data={[80, 43.7]}
-            keys={['Rural', 'Urban']}
-            titleText='Area of Residence'
-            colors={['#4daf4a', '#377eb8']}
-          />
-        </MultiDonutEl>
-      </CardFullWidthEl>
       {
-        indicatorsList && finalData && regionList && countryList
+        queryParams.get('showTopStats') !== 'false'
           ? (
             <>
-              <Context.Provider
-                value={{
-                  ...state,
-                  updateGraphType,
-                  updateSelectedRegions,
-                  updateYear,
-                  updateSelectedCountries,
-                  updateSelectedCountryGroup,
-                  updateXAxisIndicator,
-                  updateYAxisIndicator,
-                  updateColorIndicator,
-                  updateSizeIndicator,
-                  updateSelectedIncomeGroups,
-                  updateShowMostRecentData,
-                  updateShowLabel,
-                  updateShowSource,
-                  updateTrendChartCountry,
-                  updateMultiCountrytrendChartCountries,
-                  updateUseSameRange,
-                  updateReverseOrder,
-                  updateBarLayout,
-                }}
-              >
-                <GrapherComponent
-                  data={finalData}
-                  indicators={indicatorsList}
-                  regions={regionList}
-                  countries={countryList}
-                />
-              </Context.Provider>
+              <CardContainer>
+                <CardEl>
+                  Informal economy absorbs
+                  <DonutChartCard
+                    data={80}
+                  />
+                  of enterprises in the world
+                </CardEl>
+                <CardEl>
+                  People working in the informal economy
+                  <DataPointEl>
+                    2 Billion
+                  </DataPointEl>
+                </CardEl>
+                <CardEl>
+                  Percentage of the
+                  {' '}
+                  {'world\'s'}
+                  {' '}
+                  employed population in the informal economy
+                  <DonutChartCard
+                    data={60}
+                  />
+                </CardEl>
+              </CardContainer>
+              <CardFullWidthEl>
+                Share of informal employment in total employment by:
+                <MultiDonutEl>
+                  <MultiDonutChartCard
+                    data={[66, 58.1]}
+                    keys={['Male', 'Female']}
+                    colors={['#00C4AA', '#8700F9']}
+                    titleText='Gender'
+                  />
+                  <MultiDonutChartCard
+                    data={[77.1, 58.7]}
+                    keys={['15-24 Yrs', '25+ Yrs']}
+                    titleText='Age'
+                    colors={['#41b6c4', '#253494']}
+                  />
+                  <MultiDonutChartCard
+                    data={[93.8, 84.6, 51.7, 23.8]}
+                    keys={['No Edu.', 'Primary', 'Secondary', 'Tertiary']}
+                    titleText='Education'
+                    colors={['#d7191c', '#fdae61', '#abdda4', '#2b83ba']}
+                  />
+                  <MultiDonutChartCard
+                    data={[80, 43.7]}
+                    keys={['Rural', 'Urban']}
+                    titleText='Area of Residence'
+                    colors={['#4daf4a', '#377eb8']}
+                  />
+                </MultiDonutEl>
+              </CardFullWidthEl>
             </>
-          )
-          : (
-            <VizAreaEl>
-              <Spin size='large' />
-            </VizAreaEl>
-          )
+          ) : null
+      }
+      {
+        queryParams.get('showVizTool') !== 'false' ? (
+          <>
+            {
+              indicatorsList && finalData && regionList && countryList
+                ? (
+                  <>
+                    <Context.Provider
+                      value={{
+                        ...state,
+                        updateGraphType,
+                        updateSelectedRegions,
+                        updateYear,
+                        updateSelectedCountries,
+                        updateSelectedCountryGroup,
+                        updateXAxisIndicator,
+                        updateYAxisIndicator,
+                        updateColorIndicator,
+                        updateSizeIndicator,
+                        updateSelectedIncomeGroups,
+                        updateShowMostRecentData,
+                        updateShowLabel,
+                        updateShowSource,
+                        updateTrendChartCountry,
+                        updateMultiCountrytrendChartCountries,
+                        updateUseSameRange,
+                        updateReverseOrder,
+                        updateBarLayout,
+                      }}
+                    >
+                      <GrapherComponent
+                        data={finalData}
+                        indicators={indicatorsList}
+                        regions={regionList}
+                        countries={countryList}
+                      />
+                    </Context.Provider>
+                  </>
+                )
+                : (
+                  <VizAreaEl>
+                    <Spin size='large' />
+                  </VizAreaEl>
+                )
+            }
+          </>
+        ) : null
+
       }
     </>
   );
