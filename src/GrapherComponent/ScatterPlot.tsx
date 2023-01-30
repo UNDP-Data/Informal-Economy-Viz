@@ -1,7 +1,6 @@
 import {
   useContext, useState,
 } from 'react';
-import styled from 'styled-components';
 import { format } from 'd3-format';
 import maxBy from 'lodash.maxby';
 import max from 'lodash.max';
@@ -13,7 +12,7 @@ import {
 import minBy from 'lodash.minby';
 import { Tooltip } from '../Components/Tooltip';
 import {
-  CtxDataType, DataType, HoverDataType, HoverRowDataType, IndicatorMetaDataWithYear,
+  CountryGroupDataType, CtxDataType, HoverDataType, HoverRowDataType, IndicatorMetaDataWithYear,
 } from '../Types';
 import Context from '../Context/Context';
 import {
@@ -21,14 +20,9 @@ import {
 } from '../Constants';
 
 interface Props {
-  data: DataType[];
+  data: CountryGroupDataType[];
   indicators: IndicatorMetaDataWithYear[];
 }
-
-const El = styled.div`
-  height: calc(100% - 71px);
-  overflow-y: hidden;
-`;
 
 export const ScatterPlot = (props: Props) => {
   const {
@@ -84,14 +78,14 @@ export const ScatterPlot = (props: Props) => {
       const radiusIndicatorIndex = radiusScale ? d.indicators.findIndex((el) => sizeIndicatorMetaData?.DataKey === el.indicator) : -1;
 
       const radiusValue = !radiusScale ? 5 : radiusIndicatorIndex === -1 ? undefined
-        : year !== -1 && !showMostRecentData ? d.indicators[radiusIndicatorIndex]?.yearlyData[d.indicators[radiusIndicatorIndex]?.yearlyData.findIndex((el) => el.year === year)]?.value
-          : d.indicators[radiusIndicatorIndex]?.yearlyData[d.indicators[radiusIndicatorIndex]?.yearlyData.length - 1]?.value;
+        : year !== -1 && !showMostRecentData ? d.indicators[radiusIndicatorIndex].yearlyData[d.indicators[radiusIndicatorIndex].yearlyData.findIndex((el) => el.year === year)]?.value
+          : d.indicators[radiusIndicatorIndex].yearlyData[d.indicators[radiusIndicatorIndex].yearlyData.length - 1]?.value;
       const xVal = xIndicatorIndex === -1 ? undefined
-        : year !== -1 && !showMostRecentData ? d.indicators[xIndicatorIndex]?.yearlyData[d.indicators[xIndicatorIndex]?.yearlyData.findIndex((el) => el.year === year)]?.value
-          : d.indicators[xIndicatorIndex]?.yearlyData[d.indicators[xIndicatorIndex]?.yearlyData.length - 1]?.value;
+        : year !== -1 && !showMostRecentData ? d.indicators[xIndicatorIndex].yearlyData[d.indicators[xIndicatorIndex].yearlyData.findIndex((el) => el.year === year)]?.value
+          : d.indicators[xIndicatorIndex].yearlyData[d.indicators[xIndicatorIndex].yearlyData.length - 1]?.value;
       const yVal = yIndicatorIndex === -1 ? undefined
-        : year !== -1 && !showMostRecentData ? d.indicators[yIndicatorIndex]?.yearlyData[d.indicators[yIndicatorIndex]?.yearlyData.findIndex((el) => el.year === year)]?.value
-          : d.indicators[yIndicatorIndex]?.yearlyData[d.indicators[yIndicatorIndex]?.yearlyData.length - 1]?.value;
+        : year !== -1 && !showMostRecentData ? d.indicators[yIndicatorIndex].yearlyData[d.indicators[yIndicatorIndex].yearlyData.findIndex((el) => el.year === year)]?.value
+          : d.indicators[yIndicatorIndex].yearlyData[d.indicators[yIndicatorIndex].yearlyData.length - 1]?.value;
       const colorVal = colorIndicator === 'Continents' ? d['Group 1']
         : colorIndicator === 'Income Groups' ? d['Income group']
           : colorIndicator === 'Human Development Index' ? year !== -1 && !showMostRecentData ? d.indicators[colorIndicatorIndex].yearlyData[d.indicators[colorIndicatorIndex].yearlyData.findIndex((el) => el.year === year)]?.value
@@ -106,7 +100,7 @@ export const ScatterPlot = (props: Props) => {
       const radiusYear = (year === -1 || showMostRecentData) && radiusIndicatorIndex !== -1 ? d.indicators[radiusIndicatorIndex]?.yearlyData[d.indicators[radiusIndicatorIndex]?.yearlyData.length - 1]?.year : year;
       const colorYear = (year === -1 || showMostRecentData) && colorIndicatorIndex !== -1 ? d.indicators[colorIndicatorIndex]?.yearlyData[d.indicators[colorIndicatorIndex]?.yearlyData.length - 1]?.year : year;
       return ({
-        countryCode: d['Alpha-3 code-1'],
+        countryCode: d['Alpha-3 code'],
         radiusValue,
         xVal,
         yVal,
@@ -187,7 +181,11 @@ export const ScatterPlot = (props: Props) => {
   const colorScale = colorIndicator === 'Human Development Index' ? scaleThreshold<string | number, string>().domain(colorDomain).range(COLOR_SCALES.Divergent.Color4).unknown('#666') : scaleOrdinal<string | number, string>().domain(colorDomain).range(colorList).unknown('#666');
 
   return (
-    <El>
+    <div style={{
+      height: 'calc(100% - 89px)',
+      overflowY: 'hidden',
+    }}
+    >
       <svg width='100%' height='100%' viewBox={`0 0 ${svgWidth} ${svgHeight}`}>
         <g
           transform='translate(90,20)'
@@ -390,7 +388,7 @@ export const ScatterPlot = (props: Props) => {
 
           {
             dataFormatted.map((d, i) => {
-              const countryData = data[data.findIndex((el) => el['Alpha-3 code-1'] === d.countryCode)];
+              const countryData = data[data.findIndex((el) => el['Alpha-3 code'] === d.countryCode)];
               const incomeGroupOpacity = selectedIncomeGroups.length === 0 || selectedIncomeGroups.indexOf(countryData['Income group']) !== -1;
               const countryOpacity = selectedCountries.length === 0 || selectedCountries.indexOf(countryData['Country or Area']) !== -1;
               const selectedColorOpacity = d.colorVal !== undefined ? !selectedColor || selectedColor === colorScale(d.colorVal) as string : !selectedColor;
@@ -465,7 +463,7 @@ export const ScatterPlot = (props: Props) => {
                             dy={4}
                             dx={3}
                           >
-                            {countryData['Alpha-3 code-1']}
+                            {countryData['Alpha-3 code']}
                           </text>
                         ) : null
                     }
@@ -505,6 +503,6 @@ export const ScatterPlot = (props: Props) => {
       {
         hoverData ? <Tooltip data={hoverData} /> : null
       }
-    </El>
+    </div>
   );
 };

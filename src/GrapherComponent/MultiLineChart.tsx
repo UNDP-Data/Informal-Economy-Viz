@@ -8,16 +8,16 @@ import { Select } from 'antd';
 import { format } from 'd3-format';
 import range from 'lodash.range';
 import {
-  CtxDataType, DataType, HoverDataType, IndicatorMetaDataWithYear,
+  CtxDataType, CountryGroupDataType, HoverDataType, IndicatorMetaDataWithYear, CountryListType,
 } from '../Types';
 import Context from '../Context/Context';
 import { COLOR_SCALES, MAX_TEXT_LENGTH } from '../Constants';
 import { TooltipForMultiLineChart } from '../Components/TooltipForMultiLineChart';
 
 interface Props {
-  data: DataType[];
+  data: CountryGroupDataType[];
   indicators: IndicatorMetaDataWithYear[];
-  countries: string[];
+  countries: CountryListType[];
 }
 
 interface DataFormattedType {
@@ -30,25 +30,19 @@ const El = styled.div`
   overflow-y: hidden;
 `;
 
-const SelectEl = styled.div`
-  padding: 2rem;
-  box-shadow: var(--shadow-bottom);
-`;
-
 const GraphEl = styled.div`
-  height: calc(100% - 72px);
+  height: calc(100% - 89px);
 `;
 
 const ErrorNote = styled.div`
   width: 80%;
   margin: auto;
   padding: 1rem 2rem;
-  font-size: 1.8rem;
-  color: var(--red);
+  font-size: 1.25rem;
+  color: var(--dark-red);
   text-align: center;
-  background-color: var(--red-bg);
-  border: 1px solid var(--red);
-  border-radius: 0.5rem;
+  background-color: var(--white);
+  border: 1px solid var(--dark-red);
   position: relative;
   top: 50%;
   transform: translateY(-50%);
@@ -57,13 +51,10 @@ const ErrorNote = styled.div`
 const InfoNote = styled.div`
   width: 80%;
   margin: auto;
-  padding: 1rem 2rem;
-  font-size: 1.8rem;
-  color: var(--primary-blue);
   text-align: center;
-  background-color: var(--blue-bg);
-  border: 1px solid var(--primary-blue);
-  border-radius: 0.5rem;
+  padding: 2rem;
+  background-color: var(--white);
+  border: 1px solid var(--gray-300);
   position: relative;
   top: 50%;
   transform: translateY(-50%);
@@ -117,7 +108,7 @@ export const MultiLineChart = (props: Props) => {
     }
     return ({
       countryName: d['Country or Area'],
-      alphaCode3: d['Alpha-3 code-1'],
+      alphaCode3: d['Alpha-3 code'],
       countryFormattedData,
     });
   });
@@ -140,28 +131,23 @@ export const MultiLineChart = (props: Props) => {
   const xTicks = x.ticks(maxYearFiltered - minYearFiltered > 10 ? 10 : maxYearFiltered - minYearFiltered === 0 ? 1 : maxYearFiltered - minYearFiltered);
   return (
     <El>
-      <SelectEl>
+      <div style={{ padding: 'var(--spacing-06)', backgroundColor: 'var(--white)', borderBottom: '1px solid var(--gray-400)' }}>
         <Select
           showSearch
           mode='multiple'
-          style={
-            {
-              width: '100%',
-              borderRadius: '1rem',
-            }
-          }
+          className='undp-select'
           placeholder='Please select a country'
           onChange={(d) => { updateMultiCountrytrendChartCountries(d); }}
           value={multiCountrytrendChartCountries}
           maxTagCount='responsive'
         >
           {
-            countries.map((d) => (
-              <Select.Option key={d}>{d}</Select.Option>
+            countries.map((d) => d.name).map((d) => (
+              <Select.Option className='undp-select-option' key={d}>{d}</Select.Option>
             ))
           }
         </Select>
-      </SelectEl>
+      </div>
       <GraphEl>
         {
           multiCountrytrendChartCountries && valueArray.length > 0
@@ -372,19 +358,14 @@ export const MultiLineChart = (props: Props) => {
               <>Please select a country above to see the trend for that country</>
               <Select
                 showSearch
-                style={
-                  {
-                    width: '100%',
-                    borderRadius: '1rem',
-                  }
-                }
+                className='undp-select'
                 placeholder='Please select a country'
                 value={multiCountrytrendChartCountries}
                 onChange={(d) => { updateMultiCountrytrendChartCountries(d); }}
               >
                 {
-                  countries.map((d) => (
-                    <Select.Option key={d}>{d}</Select.Option>
+                  countries.map((d) => d.name).map((d) => (
+                    <Select.Option className='undp-select-options' key={d}>{d}</Select.Option>
                   ))
                 }
               </Select>
@@ -392,7 +373,29 @@ export const MultiLineChart = (props: Props) => {
           ) : null
         }
         {
-          valueArray.length === 0 && multiCountrytrendChartCountries ? (
+          multiCountrytrendChartCountries.length === 0 ? (
+            <InfoNote>
+              <h5 className='undp-typography'>Please select countries to see their trends</h5>
+              <Select
+                showSearch
+                mode='multiple'
+                className='undp-select'
+                placeholder='Please select a country'
+                onChange={(d) => { updateMultiCountrytrendChartCountries(d); }}
+                value={multiCountrytrendChartCountries}
+                maxTagCount='responsive'
+              >
+                {
+                  countries.map((d) => d.name).map((d) => (
+                    <Select.Option className='undp-select-option' key={d}>{d}</Select.Option>
+                  ))
+                }
+              </Select>
+            </InfoNote>
+          ) : null
+        }
+        {
+          valueArray.length === 0 && multiCountrytrendChartCountries.length > 0 ? (
             <ErrorNote>
               No data available for the countries selected
             </ErrorNote>

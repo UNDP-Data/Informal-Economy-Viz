@@ -7,16 +7,16 @@ import minBy from 'lodash.minby';
 import { Select } from 'antd';
 import { format } from 'd3-format';
 import {
-  CtxDataType, DataType, HoverDataType, IndicatorMetaDataWithYear,
+  CtxDataType, CountryGroupDataType, HoverDataType, IndicatorMetaDataWithYear, CountryListType,
 } from '../Types';
 import Context from '../Context/Context';
 import { Tooltip } from '../Components/Tooltip';
 import { MAX_TEXT_LENGTH } from '../Constants';
 
 interface Props {
-  data: DataType[];
+  data: CountryGroupDataType[];
   indicators: IndicatorMetaDataWithYear[];
-  countries: string[];
+  countries: CountryListType[];
 }
 
 interface DataFormattedType {
@@ -30,25 +30,19 @@ const El = styled.div`
   overflow-y: hidden;
 `;
 
-const SelectEl = styled.div`
-  padding: 2rem;
-  box-shadow: var(--shadow-bottom);
-`;
-
 const GraphEl = styled.div`
-  height: calc(100% - 72px);
+  height: calc(100% - 89px);
 `;
 
 const ErrorNote = styled.div`
   width: 80%;
   margin: auto;
   padding: 1rem 2rem;
-  font-size: 1.8rem;
-  color: var(--red);
+  font-size: 1.25rem;
+  color: var(--dark-red);
   text-align: center;
-  background-color: var(--red-bg);
-  border: 1px solid var(--red);
-  border-radius: 0.5rem;
+  background-color: var(--white);
+  border: 1px solid var(--dark-red);
   position: relative;
   top: 50%;
   transform: translateY(-50%);
@@ -57,13 +51,10 @@ const ErrorNote = styled.div`
 const InfoNote = styled.div`
   width: 80%;
   margin: auto;
-  padding: 1rem 2rem;
-  font-size: 1.8rem;
-  color: var(--primary-blue);
   text-align: center;
-  background-color: var(--blue-bg);
-  border: 1px solid var(--primary-blue);
-  border-radius: 0.5rem;
+  padding: 2rem;
+  background-color: var(--white);
+  border: 1px solid var(--gray-300);
   position: relative;
   top: 50%;
   transform: translateY(-50%);
@@ -112,8 +103,8 @@ export const DualAxisLineChart = (props: Props) => {
   for (let i = minYear; i < maxYear + 1; i += 1) {
     dataFormatted.push({
       year: i,
-      param1: countryData?.indicators[xIndicatorIndex]?.yearlyData[countryData?.indicators[xIndicatorIndex].yearlyData.findIndex((d) => d.year === i)]?.value,
-      param2: countryData?.indicators[yIndicatorIndex]?.yearlyData[countryData?.indicators[yIndicatorIndex].yearlyData.findIndex((d) => d.year === i)]?.value,
+      param1: countryData?.indicators[xIndicatorIndex].yearlyData[countryData?.indicators[xIndicatorIndex].yearlyData.findIndex((d) => d.year === i)]?.value,
+      param2: countryData?.indicators[yIndicatorIndex].yearlyData[countryData?.indicators[yIndicatorIndex].yearlyData.findIndex((d) => d.year === i)]?.value,
     });
   }
   const minParam1: number = minBy(dataFormatted, (d) => d.param1)?.param1 ? minBy(dataFormatted, (d) => d.param1)?.param1 as number > 0 ? 0 : minBy(dataFormatted, (d) => d.param1)?.param1 as number : 0;
@@ -154,26 +145,21 @@ export const DualAxisLineChart = (props: Props) => {
   );
   return (
     <El>
-      <SelectEl>
+      <div style={{ padding: 'var(--spacing-06)', backgroundColor: 'var(--white)', borderBottom: '1px solid var(--gray-400)' }}>
         <Select
           showSearch
-          style={
-            {
-              width: '100%',
-              borderRadius: '1rem',
-            }
-          }
+          className='undp-select'
           placeholder='Please select a country'
           onChange={(d) => { updateTrendChartCountry(d); }}
           value={trendChartCountry}
         >
           {
-            countries.map((d) => (
-              <Select.Option key={d}>{d}</Select.Option>
+            countries.map((d) => d.name).map((d) => (
+              <Select.Option className='undp-select-option' key={d}>{d}</Select.Option>
             ))
           }
         </Select>
-      </SelectEl>
+      </div>
       <GraphEl>
         {
           trendChartCountry && dataFilterd.length > 0
@@ -461,22 +447,17 @@ export const DualAxisLineChart = (props: Props) => {
         {
           !trendChartCountry ? (
             <InfoNote>
-              <>Please select a country above to see the trend for that country</>
+              <h5 className='undp-typography'>Please select a country to see the trend for that country</h5>
               <Select
                 showSearch
-                style={
-                  {
-                    width: '100%',
-                    borderRadius: '1rem',
-                  }
-                }
+                className='undp-select'
                 placeholder='Please select a country'
                 value={trendChartCountry}
                 onChange={(d) => { updateTrendChartCountry(d); }}
               >
                 {
-                  countries.map((d) => (
-                    <Select.Option key={d}>{d}</Select.Option>
+                  countries.map((d) => d.name).map((d) => (
+                    <Select.Option className='undp-select-option' key={d}>{d}</Select.Option>
                   ))
                 }
               </Select>

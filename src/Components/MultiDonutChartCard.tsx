@@ -14,13 +14,6 @@ const Container = styled.div`
   margin: auto;
 `;
 
-const TitleEl = styled.div`
-  color: #110848;
-  text-align: left;
-  font-weight: bold;
-  padding: 2rem;
-`;
-
 export const MultiDonutChartCard = (props: Props) => {
   const {
     data,
@@ -30,9 +23,9 @@ export const MultiDonutChartCard = (props: Props) => {
   } = props;
   return (
     <Container>
-      <TitleEl>
+      <h6 className='undp-typography'>
         {titleText}
-      </TitleEl>
+      </h6>
       <svg width='100%' viewBox='0 0 275 150'>
         {
           data.map((d, i) => (

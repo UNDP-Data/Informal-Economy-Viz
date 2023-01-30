@@ -163,12 +163,6 @@ export const COLOR_SCALES = {
   ],
 };
 
-export const WBIndicators = [
-  'Employment outside the formal sector (% of total employment; International Labour Organization; hamonized series)',
-  'Dynamic general equilibrium model-based (DGE) estimates of informal output (% of official GDP)',
-  'Percent of firms competing against unregistered or informal firms (World Bank Enterprise Surveys)',
-  'Percent of firms formally registered when they started operations in the country (World Bank Enterprise Surveys)',
-  'Number of years firm operated without formal registration (World Bank Enterprise Surveys)',
-];
-
-export const DATASOURCELINK = process.env.NODE_ENV === 'production' ? 'https://data.undp.org/pillar-insights' : '.';
+export const DATALINK = process.env.NODE_ENV === 'production' ? 'https://raw.githubusercontent.com/UNDP-Data/Access-All-Data-Data-Repo/main/output_minified.json' : 'https://raw.githubusercontent.com/UNDP-Data/Access-All-Data-Data-Repo/main/output_minified.json';
+export const METADATALINK = process.env.NODE_ENV === 'production' ? 'https://raw.githubusercontent.com/UNDP-Data/Indicators-MetaData/for-redesign/indicatorMetaData.json' : 'https://raw.githubusercontent.com/UNDP-Data/Indicators-MetaData/for-redesign/indicatorMetaData.json';
+export const COUNTRYTAXONOMYLINK = process.env.NODE_ENV === 'production' ? 'https://raw.githubusercontent.com/UNDP-Data/country-taxonomy-from-azure/main/country_territory_groups.json' : 'https://raw.githubusercontent.com/UNDP-Data/country-taxonomy-from-azure/main/country_territory_groups.json';

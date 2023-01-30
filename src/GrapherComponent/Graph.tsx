@@ -4,7 +4,9 @@ import {
 import styled from 'styled-components';
 import { Slider } from 'antd';
 import intersection from 'lodash.intersection';
-import { CtxDataType, DataType, IndicatorMetaDataWithYear } from '../Types';
+import {
+  CountryGroupDataType, CountryListType, CtxDataType, IndicatorMetaDataWithYear,
+} from '../Types';
 import Context from '../Context/Context';
 import { HorizontalBarChart } from './HorizontalBarChart';
 import { ScatterPlot } from './ScatterPlot';
@@ -17,9 +19,9 @@ import { LineChart } from './LineChart';
 import { PauseIcon, PlayIcon } from '../Icons';
 
 interface Props {
-  data: DataType[];
+  data: CountryGroupDataType[];
   indicators: IndicatorMetaDataWithYear[];
-  countries: string[];
+  countries: CountryListType[];
   fullWidth: boolean;
 }
 
@@ -30,9 +32,11 @@ interface ElProps {
 const El = styled.div<ElProps>`
   width: ${(props) => (props.fullWidth ? '100%' : '75%')};
   box-shadow: var(--shadow-right);
+  flex-grow: 1;
   overflow: auto;
   @media (min-width: 961px) {
-    height: 74rem;
+    height: 100vh;
+    min-height: (46.25rem + 4rem);
   }
   @media (max-width: 960px) {
     width: 100%;
@@ -40,36 +44,36 @@ const El = styled.div<ElProps>`
 `;
 
 const SliderEl = styled.div`
-  padding: 2rem 1rem 2rem 0;
+  padding: var(--spacing-06) var(--spacing-06) var(--spacing-08) var(--spacing-06);
   display: flex;
   align-items: center;
-  background-color: var(--black-200);
-  box-shadow: var(--shadow-bottom);
+  background-color: var(--gray-200);
+  border-bottom: 1px solid var(--gray-400);
   position: sticky;
   top: 0;
 `;
 
 const ErrorNote = styled.div`
-  padding: 1.8rem 2rem;
-  background-color: var(--red-bg);
-  color: var(--red);
-  height: 6.2rem;
-  box-shadow: var(--shadow-bottom); 
+  padding: 1rem 1.25rem;
+  background-color: var(--light-red);
+  color: var(--dark-red);
   text-align: center;
-  font-style: italic;
+  align-items: center;
   position: sticky;
+  font-size: 1.5rem;
+  font-weight: bold;
   top: 0;
 `;
 
 const InfoNote = styled.div`
-  padding: 1.8rem 2rem;
-  background-color: var(--black-200);
-  color: var(--primary-blue);
-  box-shadow: var(--shadow-bottom); 
-  height: 6.2rem;
-  font-style: italic;
+  padding: 1rem 1.25rem;
+  background-color: var(--blue-200);
+  color: var(--blue-700);
   text-align: center;
+  align-items: center;
   position: sticky;
+  font-size: 1.5rem;
+  font-weight: bold;
   top: 0;
 `;
 
@@ -161,7 +165,11 @@ export const Graph = (props: Props) => {
     if (yearForPlay !== undefined) { updateYear(yearForPlay as number); }
   }, [yearForPlay]);
   return (
-    <El id='graph-node' fullWidth={fullWidth}>
+    <El
+      id='graph-node'
+      fullWidth={fullWidth}
+      className='undp-scrollbar'
+    >
       {
         graphType === 'trendLine' || graphType === 'multiCountryTrendLine' ? null
           : commonYears.length > 1 && !showMostRecentData ? (
@@ -169,8 +177,8 @@ export const Graph = (props: Props) => {
               <Button onClick={() => { setPlay(!play); }} role='button'>
                 {
                   play
-                    ? <PauseIcon size={18} fill='#006EB5' />
-                    : <PlayIcon size={18} fill='#006EB5' />
+                    ? <PauseIcon size={24} fill='#D12800' />
+                    : <PlayIcon size={24} fill='#D12800' />
                 }
               </Button>
               <Slider
@@ -179,18 +187,19 @@ export const Graph = (props: Props) => {
                 marks={marks}
                 step={null}
                 value={year}
-                style={{ width: '95%', margin: '0 auto' }}
+                style={{ width: '97%', margin: '0 auto' }}
                 onChange={(d) => { updateYear(d); setYearForPlay(d); }}
-                tooltipVisible
+                className='undp-slider'
+                tooltip={{ open: true, prefixCls: 'undp-slider-tooltip' }}
               />
             </SliderEl>
           ) : commonYears.length === 0 || showMostRecentData ? (
             <ErrorNote>
               {
-              commonYears.length === 0
-                ? 'The data selected are not available for the same years therefore showing the last available data for all the countries.'
-                : 'Showing the last available data for all the countries.'
-            }
+                commonYears.length === 0
+                  ? 'The data selected are not available for the same years therefore showing the last available data for all the countries.'
+                  : 'Showing the last available data for all the countries.'
+              }
             </ErrorNote>
           ) : (
             <InfoNote>

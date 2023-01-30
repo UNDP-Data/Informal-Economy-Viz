@@ -12,7 +12,7 @@ import {
   scaleThreshold, scaleOrdinal, scaleSqrt,
 } from 'd3-scale';
 import {
-  CtxDataType, DataType, HoverDataType, HoverRowDataType, IndicatorMetaDataWithYear,
+  CtxDataType, CountryGroupDataType, HoverDataType, HoverRowDataType, IndicatorMetaDataWithYear,
 } from '../Types';
 import Context from '../Context/Context';
 import World from '../Data/worldMap.json';
@@ -20,75 +20,65 @@ import { COLOR_SCALES } from '../Constants';
 import { Tooltip } from '../Components/Tooltip';
 
 interface Props {
-  data: DataType[];
+  data: CountryGroupDataType[];
   indicators: IndicatorMetaDataWithYear[];
 }
 
 const El = styled.div`
-  height: calc(100% - 72px);
+  height: calc(100% - 89px);
   overflow-y: hidden;
 `;
 
 const LegendEl = styled.div`
-  padding: 1rem;
-  background-color:rgba(255,255,255,0.1);
-  box-shadow: var(--shadow);
-  margin-left: 1rem;
-  margin-top: -2rem;
-  width: 20rem;
+  padding: 0.75rem;
+  margin-left: 0.75rem;
+  margin-top: -1.25rem;
   position: relative;
-  z-index: 1000;
+  z-index: 5;
+  padding-right: 5rem;
 `;
 
 const LegendSizeEl = styled.div`
-  padding: 1rem;
-  background-color:rgba(255,255,255,0.1);
-  box-shadow: var(--shadow);
-  margin-left: 1rem;
-  width: 15.5rem;
+  padding: 0.75rem;
+  margin-left: 0.75rem;
+  width: 10rem;
   position: relative;
-  z-index: 1000;
+  z-index: 5;
 `;
 
-const TitleEl = styled.div`
-  font-size: 1.2rem;
-  line-height: 1.2rem;
-  font-weight: bold;
+const TitleEl = styled.h6`
   width: 100%;
 `;
 
 const XLegendTitle = styled.div`
   text-align: center;
   font-style: normal;
-  font-size: 1rem;
-  line-height: 1.2rem;
-  color: var(--black-700);
-  width:13rem;
+  font-size: 0.75rem;
+  color: var(--gray-700);
+  width:8.125rem;
 `;
 
 const YLegendTitle = styled.div`
   text-align: center;
   font-style: normal;
-  font-size: 1rem;
-  line-height: 1.2rem;
-  width: 13rem;
-  color: var(--black-700);    
+  font-size: 0.75rem;
+  width:8.125rem;
+  color: var(--gray-700);    
   position: absolute;
   top: 80px;
   transform: translateY(-50%) translateX(50%) rotate(-90deg) translateY(100%);
-`;
-
-const LegendColorEl = styled.div`
-  display: flex;
-  pointer-events: auto;
 `;
 
 const LegendContainer = styled.div`
   display: flex;
   margin-top: -2rem;
   pointer-events: none;
+  margin-left: 1rem;
+  padding-top: 1rem;
   @media (min-width: 961px) {
     transform: translateY(-100%);
+    width: fit-content;
+    background-color: rgba(255,255,255, 0.75);
   }
 `;
 
@@ -179,7 +169,7 @@ export const BivariateMap = (props: Props) => {
         <g ref={mapG}>
           {
             (World as any).features.map((d: any, i: number) => {
-              const index = data.findIndex((el: any) => el['Alpha-3 code-1'] === d.properties.ISO3);
+              const index = data.findIndex((el: any) => el['Alpha-3 code'] === d.properties.ISO3);
               if ((index !== -1) || d.properties.NAME === 'Antarctica') return null;
               return (
                 <g
@@ -230,8 +220,8 @@ export const BivariateMap = (props: Props) => {
             })
           }
           {
-            data.map((d, i: number) => {
-              const index = (World as any).features.findIndex((el: any) => d['Alpha-3 code-1'] === el.properties.ISO3);
+            data.map((d, i) => {
+              const index = (World as any).features.findIndex((el: any) => d['Alpha-3 code'] === el.properties.ISO3);
               const xIndicatorIndex = d.indicators.findIndex((el) => xIndicatorMetaData.DataKey === el.indicator);
               const yIndicatorIndex = d.indicators.findIndex((el) => yIndicatorMetaData.DataKey === el.indicator);
               const xVal = xIndicatorIndex === -1 ? undefined
@@ -254,7 +244,7 @@ export const BivariateMap = (props: Props) => {
                   title: xAxisIndicator,
                   value: xVal === undefined ? 'NA' : xVal,
                   type: 'color',
-                  year: year === -1 || showMostRecentData ? d.indicators[xIndicatorIndex]?.yearlyData[d.indicators[xIndicatorIndex]?.yearlyData.length - 1]?.year : year,
+                  year: xIndicatorIndex === -1 ? undefined : year === -1 || showMostRecentData ? d.indicators[xIndicatorIndex].yearlyData[d.indicators[xIndicatorIndex].yearlyData.length - 1]?.year : year,
                   color,
                   prefix: xIndicatorMetaData?.LabelPrefix,
                   suffix: xIndicatorMetaData?.LabelSuffix,
@@ -263,7 +253,7 @@ export const BivariateMap = (props: Props) => {
                   title: yAxisIndicator,
                   value: yVal === undefined ? 'NA' : yVal,
                   type: 'color',
-                  year: year === -1 || showMostRecentData ? d.indicators[yIndicatorIndex]?.yearlyData[d.indicators[yIndicatorIndex]?.yearlyData.length - 1]?.year : year,
+                  year: yIndicatorIndex === -1 ? undefined : year === -1 || showMostRecentData ? d.indicators[yIndicatorIndex].yearlyData[d.indicators[yIndicatorIndex].yearlyData.length - 1]?.year : year,
                   color,
                   prefix: yIndicatorMetaData?.LabelPrefix,
                   suffix: yIndicatorMetaData?.LabelSuffix,
@@ -272,15 +262,15 @@ export const BivariateMap = (props: Props) => {
               if (sizeIndicatorMetaData) {
                 const sizeIndicatorIndex = d.indicators.findIndex((el) => sizeIndicatorMetaData?.DataKey === el.indicator);
                 const sizeVal = sizeIndicatorIndex === -1 ? undefined
-                  : year !== -1 && !showMostRecentData ? d.indicators[sizeIndicatorIndex]?.yearlyData[d.indicators[sizeIndicatorIndex]?.yearlyData.findIndex((el) => el.year === year)]?.value
-                    : d.indicators[sizeIndicatorIndex]?.yearlyData[d.indicators[sizeIndicatorIndex]?.yearlyData.length - 1]?.value;
+                  : year !== -1 && !showMostRecentData ? d.indicators[sizeIndicatorIndex].yearlyData[d.indicators[sizeIndicatorIndex].yearlyData.findIndex((el) => el.year === year)]?.value
+                    : d.indicators[sizeIndicatorIndex].yearlyData[d.indicators[sizeIndicatorIndex].yearlyData.length - 1]?.value;
                 rowData.push({
                   title: sizeIndicator,
                   value: sizeVal !== undefined ? sizeVal : 'NA',
                   type: 'size',
                   prefix: sizeIndicatorMetaData?.LabelPrefix,
                   suffix: sizeIndicatorMetaData?.LabelSuffix,
-                  year: year === -1 || showMostRecentData ? d.indicators[sizeIndicatorIndex]?.yearlyData[d.indicators[sizeIndicatorIndex]?.yearlyData.length - 1]?.year : year,
+                  year: sizeIndicatorIndex === -1 ? undefined : year === -1 || showMostRecentData ? d.indicators[sizeIndicatorIndex].yearlyData[d.indicators[sizeIndicatorIndex].yearlyData.length - 1]?.year : year,
                 });
               }
 
@@ -315,7 +305,7 @@ export const BivariateMap = (props: Props) => {
                   }}
                 >
                   {
-                    index === -1 ? null
+                    index === -1 || d['Country or Area'] === 'Antarctica' ? null
                       : (World as any).features[index].geometry.type === 'MultiPolygon' ? (World as any).features[index].geometry.coordinates.map((el:any, j: any) => {
                         let masterPath = '';
                         el.forEach((geo: number[][]) => {
@@ -360,7 +350,7 @@ export const BivariateMap = (props: Props) => {
           }
           {
             hoverData
-              ? (World as any).features.filter((d: any) => d.properties.ISO3 === data[data.findIndex((el: DataType) => el['Country or Area'] === hoverData?.country)]['Alpha-3 code-1']).map((d: any, i: number) => (
+              ? (World as any).features.filter((d: any) => d.properties.ISO3 === data[data.findIndex((el) => el['Country or Area'] === hoverData?.country)]['Alpha-3 code']).map((d: any, i: number) => (
                 <G
                   key={i}
                   opacity={!selectedColor ? 1 : 0}
@@ -443,7 +433,7 @@ export const BivariateMap = (props: Props) => {
                         title: xAxisIndicator,
                         value: xVal === undefined ? 'NA' : xVal,
                         type: 'color',
-                        year: year === -1 || showMostRecentData ? d.indicators[xIndicatorIndex]?.yearlyData[d.indicators[xIndicatorIndex]?.yearlyData.length - 1]?.year : year,
+                        year: xIndicatorIndex === -1 ? undefined : year === -1 || showMostRecentData ? d.indicators[xIndicatorIndex].yearlyData[d.indicators[xIndicatorIndex].yearlyData.length - 1]?.year : year,
                         color,
                         prefix: xIndicatorMetaData?.LabelPrefix,
                         suffix: xIndicatorMetaData?.LabelSuffix,
@@ -452,7 +442,7 @@ export const BivariateMap = (props: Props) => {
                         title: yAxisIndicator,
                         value: yVal === undefined ? 'NA' : yVal,
                         type: 'color',
-                        year: year === -1 || showMostRecentData ? d.indicators[yIndicatorIndex]?.yearlyData[d.indicators[yIndicatorIndex]?.yearlyData.length - 1]?.year : year,
+                        year: yIndicatorIndex === -1 ? undefined : year === -1 || showMostRecentData ? d.indicators[yIndicatorIndex].yearlyData[d.indicators[yIndicatorIndex].yearlyData.length - 1]?.year : year,
                         color,
                         prefix: yIndicatorMetaData?.LabelPrefix,
                         suffix: yIndicatorMetaData?.LabelSuffix,
@@ -465,7 +455,7 @@ export const BivariateMap = (props: Props) => {
                         type: 'size',
                         prefix: sizeIndicatorMetaData?.LabelPrefix,
                         suffix: sizeIndicatorMetaData?.LabelSuffix,
-                        year: year === -1 || showMostRecentData ? d.indicators[sizeIndicatorIndex]?.yearlyData[d.indicators[sizeIndicatorIndex]?.yearlyData.length - 1]?.year : year,
+                        year: sizeIndicatorIndex === -1 ? undefined : year === -1 || showMostRecentData ? d.indicators[sizeIndicatorIndex].yearlyData[d.indicators[sizeIndicatorIndex].yearlyData.length - 1]?.year : year,
                       });
                     }
 
@@ -517,10 +507,15 @@ export const BivariateMap = (props: Props) => {
       </svg>
       <LegendContainer>
         <LegendEl>
-          <LegendColorEl>
+          <div
+            style={{
+              display: 'flex',
+              pointerEvents: 'auto',
+            }}
+          >
             <YLegendTitle>{yIndicatorMetaData.IndicatorLabelTable}</YLegendTitle>
             <div>
-              <svg width='135px' viewBox={`0 0 ${135} ${135}`}>
+              <svg width='135px' viewBox='0 0 135 135'>
                 <g>
                   {
                   COLOR_SCALES[`Bivariate${Math.max(Math.min((yKey.length + 1), 5), 4) as 4 | 5}x${Math.max(Math.min((xKey.length + 1), 5), 4) as 4 | 5}`].map((d, i) => (
@@ -589,14 +584,14 @@ export const BivariateMap = (props: Props) => {
               </svg>
               <XLegendTitle>{xIndicatorMetaData.IndicatorLabelTable}</XLegendTitle>
             </div>
-          </LegendColorEl>
+          </div>
         </LegendEl>
         {
           sizeIndicator
             ? (
               <LegendSizeEl>
                 <>
-                  <TitleEl>{sizeIndicatorMetaData.IndicatorLabelTable}</TitleEl>
+                  <TitleEl className='margin-bottom-00 margin-top-00'>{sizeIndicatorMetaData.IndicatorLabelTable}</TitleEl>
                   <svg width='135' height='90' viewBox='0 0 175 100' fill='none' xmlns='http://www.w3.org/2000/svg'>
                     <text fontSize={12} fontWeight={700} textAnchor='middle' fill='#212121' x={4} y={95}>0</text>
                     <text fontSize={12} fontWeight={700} textAnchor='middle' fill='#212121' x={130} y={95}>{radiusScale.invert(40) > 1 ? format('~s')(radiusScale.invert(40)) : radiusScale.invert(40)}</text>

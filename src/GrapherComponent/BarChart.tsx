@@ -1,7 +1,6 @@
 import {
   useContext, useState,
 } from 'react';
-import styled from 'styled-components';
 import { format } from 'd3-format';
 import maxBy from 'lodash.maxby';
 import orderBy from 'lodash.orderby';
@@ -10,7 +9,7 @@ import {
 } from 'd3-scale';
 import minBy from 'lodash.minby';
 import {
-  CtxDataType, DataType, HoverDataType, HoverRowDataType, IndicatorMetaDataWithYear,
+  CountryGroupDataType, CtxDataType, HoverDataType, HoverRowDataType, IndicatorMetaDataWithYear,
 } from '../Types';
 import Context from '../Context/Context';
 import {
@@ -19,14 +18,9 @@ import {
 import { Tooltip } from '../Components/Tooltip';
 
 interface Props {
-  data: DataType[];
+  data: CountryGroupDataType[];
   indicators: IndicatorMetaDataWithYear[];
 }
-
-const El = styled.div`
-  height: calc(100% - 71px);
-  overflow-y: hidden;
-`;
 
 export const BarChart = (props: Props) => {
   const {
@@ -78,10 +72,11 @@ export const BarChart = (props: Props) => {
       const incomeGroup = !!(selectedIncomeGroups.length === 0 || selectedIncomeGroups.indexOf(d['Income group']) !== -1);
       const region = !!(selectedRegions.length === 0 || selectedRegions.indexOf(d['Group 2']) !== -1);
       const country = !!(selectedCountries.length === 0 || selectedCountries.indexOf(d['Country or Area']) !== -1);
-      const xYear = year === -1 || showMostRecentData ? d.indicators[xIndicatorIndex].yearlyData[d.indicators[xIndicatorIndex].yearlyData.length - 1]?.year : year;
-      const colorYear = (year === -1 || showMostRecentData) && colorIndicatorIndex !== -1 ? d.indicators[colorIndicatorIndex].yearlyData[d.indicators[colorIndicatorIndex].yearlyData.length - 1]?.year : year;
+      const xYear = year === -1 || showMostRecentData ? d.indicators[xIndicatorIndex]?.yearlyData[d.indicators[xIndicatorIndex].yearlyData.length - 1]?.year : year;
+      const colorYear = (year === -1 || showMostRecentData) && colorIndicatorIndex !== -1 ? d.indicators[colorIndicatorIndex]?.yearlyData[d.indicators[colorIndicatorIndex].yearlyData.length - 1]?.year : year;
       return ({
-        countryCode: d['Alpha-3 code-1'],
+        countryCode: d['Alpha-3 code'],
+        countryName: d['Country or Area'],
         xVal,
         colorVal,
         region,
@@ -155,9 +150,14 @@ export const BarChart = (props: Props) => {
         : colorIndicatorMetaData?.Categories ? colorIndicatorMetaData?.Categories
           : [0, 0];
   const colorScale = colorIndicator === 'Human Development Index' ? scaleThreshold<string | number, string>().domain(colorDomain).range(COLOR_SCALES.Divergent.Color4).unknown('#666') : scaleOrdinal<string | number, string>().domain(colorDomain).range(colorList).unknown('#666');
-
   return (
-    <El>
+    <div
+      className='undp-scrollbar'
+      style={{
+        height: 'calc(100% - 89px)',
+        overflowY: 'hidden',
+      }}
+    >
       <svg width='100%' height='100%' viewBox={`0 0 ${svgWidth} ${svgHeight}`}>
         <g
           transform='translate(90,20)'
@@ -306,7 +306,7 @@ export const BarChart = (props: Props) => {
 
           {
             dataFormatted.map((d, i) => {
-              const countryData = data[data.findIndex((el) => el['Alpha-3 code-1'] === d.countryCode)];
+              const countryData = data[data.findIndex((el) => el['Alpha-3 code'] === d.countryCode)];
               const selectedColorOpacity = d.colorVal !== undefined ? !selectedColor || selectedColor === colorScale(d.colorVal) as string : !selectedColor;
               const rowData: HoverRowDataType[] = [
                 {
@@ -377,18 +377,17 @@ export const BarChart = (props: Props) => {
                           <text
                             x={0}
                             y={0}
-                            fontSize='12px'
+                            fontSize='10px'
                             textAnchor={d.xVal >= 0 ? 'end' : 'start'}
                             fill='#110848'
                             transform='rotate(-90)'
                             dy='5px'
                             dx={d.xVal >= 0 ? '-5px' : '19px'}
                           >
-                            {countryData['Alpha-3 code-1']}
+                            {countryData['Alpha-3 code']}
                           </text>
                         </g>
-                      )
-                      : null
+                      ) : null
                   }
                   {
                     xScale.bandwidth() >= 20
@@ -410,12 +409,11 @@ export const BarChart = (props: Props) => {
               );
             })
           }
-
         </g>
       </svg>
       {
         hoverData ? <Tooltip data={hoverData} /> : null
       }
-    </El>
+    </div>
   );
 };

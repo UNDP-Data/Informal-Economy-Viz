@@ -1,28 +1,24 @@
+export interface IndicatorDataType {
+  indicator: string;
+  yearlyData: {
+    year: number,
+    value: number,
+  }[]
+}
 export interface CountryGroupDataType {
-  'Alpha-2 code': string;
-  'Alpha-3 code-1': string;
+  'Alpha-3 code': string;
   'Country or Area': string;
-  'Development classification': string;
   'Group 1': string;
   'Group 2': string;
-  'Group 3': string;
   'LDC': boolean;
   'LLDC': boolean;
   'Latitude (average)': number;
   'Longitude (average)': number;
-  'Numeric code': number;
   'SIDS': boolean;
   'Income group': string;
+  indicators: IndicatorDataType[];
 }
 
-export interface IndicatorDataType {
-  indicator: string;
-  yearAvailable: number[];
-  yearlyData: {
-      year: number;
-      value?: number;
-    }[];
-}
 export interface DataType extends CountryGroupDataType {
   indicators: IndicatorDataType[];
   indicatorAvailable: string[];
@@ -61,6 +57,8 @@ export interface IndicatorMetaDataType {
   BarGraph?: boolean;
   Sizing?: boolean;
   Color?: boolean;
+  SSTopics: string[];
+  SignatureSolution: string[];
 }
 
 export interface IndicatorMetaDataWithYear extends IndicatorMetaDataType {
@@ -85,7 +83,7 @@ export interface HoverDataType {
 }
 
 export interface CtxDataType {
-  graphType: 'scatterPlot' | 'map' | 'barGraph' | 'trendLine' | 'multiCountryTrendLine';
+  graphType: 'scatterPlot' | 'map' | 'barGraph' | 'trendLine' | 'multiCountryTrendLine' ;
   selectedRegions: string[];
   selectedCountries: string[];
   selectedIncomeGroups: string[];
@@ -121,4 +119,9 @@ export interface CtxDataType {
   updateTrendChartCountry: (_d: string) => void;
   updateMultiCountrytrendChartCountries: (_d: string[]) => void;
   updateBarLayout: (_d: boolean) => void;
+}
+
+export interface CountryListType {
+  code: string;
+  name: string;
 }

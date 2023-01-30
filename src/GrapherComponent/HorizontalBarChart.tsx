@@ -1,7 +1,6 @@
 import {
   useContext, useState,
 } from 'react';
-import styled from 'styled-components';
 import maxBy from 'lodash.maxby';
 import orderBy from 'lodash.orderby';
 import { format } from 'd3-format';
@@ -10,7 +9,7 @@ import {
 } from 'd3-scale';
 import minBy from 'lodash.minby';
 import {
-  CtxDataType, DataType, HoverDataType, HoverRowDataType, IndicatorMetaDataWithYear,
+  CtxDataType, CountryGroupDataType, HoverDataType, HoverRowDataType, IndicatorMetaDataWithYear,
 } from '../Types';
 import Context from '../Context/Context';
 import {
@@ -19,13 +18,9 @@ import {
 import { Tooltip } from '../Components/Tooltip';
 
 interface Props {
-  data: DataType[];
+  data: CountryGroupDataType[];
   indicators: IndicatorMetaDataWithYear[];
 }
-
-const El = styled.div`
-  height: calc(100% - 71px);
-`;
 
 export const HorizontalBarChart = (props: Props) => {
   const {
@@ -50,7 +45,7 @@ export const HorizontalBarChart = (props: Props) => {
   const margin = {
     top: 150,
     bottom: 10,
-    left: 225,
+    left: 175,
     right: 40,
   };
   const graphWidth = svgWidth - margin.left - margin.right;
@@ -76,10 +71,10 @@ export const HorizontalBarChart = (props: Props) => {
       const incomeGroup = !!(selectedIncomeGroups.length === 0 || selectedIncomeGroups.indexOf(d['Income group']) !== -1);
       const region = !!(selectedRegions.length === 0 || selectedRegions.indexOf(d['Group 2']) !== -1);
       const country = !!(selectedCountries.length === 0 || selectedCountries.indexOf(d['Country or Area']) !== -1);
-      const xYear = year === -1 || showMostRecentData ? d.indicators[xIndicatorIndex]?.yearlyData[d.indicators[xIndicatorIndex]?.yearlyData.length - 1]?.year : year;
-      const colorYear = (year === -1 || showMostRecentData) && colorIndicatorIndex !== -1 ? d.indicators[colorIndicatorIndex]?.yearlyData[d.indicators[colorIndicatorIndex]?.yearlyData.length - 1]?.year : year;
+      const xYear = year === -1 || showMostRecentData ? d.indicators[xIndicatorIndex]?.yearlyData[d.indicators[xIndicatorIndex].yearlyData.length - 1]?.year : year;
+      const colorYear = (year === -1 || showMostRecentData) && colorIndicatorIndex !== -1 ? d.indicators[colorIndicatorIndex]?.yearlyData[d.indicators[colorIndicatorIndex].yearlyData.length - 1]?.year : year;
       return ({
-        countryCode: d['Alpha-3 code-1'],
+        countryCode: d['Alpha-3 code'],
         countryName: d['Country or Area'],
         xVal,
         colorVal,
@@ -152,14 +147,14 @@ export const HorizontalBarChart = (props: Props) => {
         : colorIndicatorMetaData?.Categories ? colorIndicatorMetaData?.Categories
           : [0, 0];
   const colorScale = colorIndicator === 'Human Development Index' ? scaleThreshold<string | number, string>().domain(colorDomain).range(COLOR_SCALES.Divergent.Color4).unknown('#666') : scaleOrdinal<string | number, string>().domain(colorDomain).range(colorList).unknown('#666');
-
   return (
-    <El>
+    <div className='undp-scrollbar' style={{ height: 'calc(100% - 89px)' }}>
       <svg width='100%' viewBox={`0 0 ${svgWidth} ${svgHeight}`}>
         <text
-          x={25}
-          y={50}
-          fontSize={18}
+          x={margin.left}
+          y={30}
+          fontSize={14}
+          fontWeight='bold'
           fill='#212121'
         >
           {xIndicatorMetaData.IndicatorLabelTable}
@@ -176,60 +171,60 @@ export const HorizontalBarChart = (props: Props) => {
             {colorIndicatorMetaData?.IndicatorLabelTable ? colorIndicatorMetaData?.IndicatorLabelTable : colorIndicator}
           </text>
           {
-            colorIndicator === 'Human Development Index' ? COLOR_SCALES.Divergent.Color4.map((d, i) => (
-              <g
-                transform='translate(0,20)'
-                key={i}
-                onMouseOver={() => { setSelectedColor(d); }}
-                onMouseLeave={() => { setSelectedColor(undefined); }}
-                style={{ cursor: 'pointer' }}
-              >
-                <rect
-                  x={(i * (graphWidth - 50)) / COLOR_SCALES.Divergent.Color4.length + 1}
-                  y={1}
-                  width={((graphWidth - 50) / COLOR_SCALES.Divergent.Color4.length) - 2}
-                  height={8}
-                  fill={d}
-                  stroke={selectedColor === d ? '#212121' : d}
-                />
-                <text
-                  x={((i * (graphWidth - 50)) / COLOR_SCALES.Divergent.Color4.length) + (((graphWidth - 50) / 2) / COLOR_SCALES.Divergent.Color4.length)}
-                  y={25}
-                  textAnchor='middle'
-                  fontSize={12}
-                  fill='#212121'
-                >
-                  {HDI_LEVELS[i]}
-                </text>
-              </g>
-            )) : colorDomain.map((d, i) => (
-              <g
-                transform='translate(0,20)'
-                key={i}
-                onMouseOver={() => { setSelectedColor(colorList[i]); }}
-                onMouseLeave={() => { setSelectedColor(undefined); }}
-                style={{ cursor: 'pointer' }}
-              >
-                <rect
-                  x={(i * (graphWidth - 50)) / colorDomain.length + 1}
-                  y={1}
-                  width={((graphWidth - 50) / colorDomain.length) - 2}
-                  height={8}
-                  fill={colorList[i]}
-                  stroke={selectedColor === colorList[i] ? '#212121' : colorList[i]}
-                />
-                <text
-                  x={((i * (graphWidth - 50)) / colorDomain.length) + (((graphWidth - 50) / 2) / colorDomain.length)}
-                  y={25}
-                  textAnchor='middle'
-                  fontSize={12}
-                  fill='#212121'
-                >
-                  {d}
-                </text>
-              </g>
-            ))
-          }
+        colorIndicator === 'Human Development Index' ? COLOR_SCALES.Divergent.Color4.map((d, i) => (
+          <g
+            transform='translate(0,20)'
+            key={i}
+            onMouseOver={() => { setSelectedColor(d); }}
+            onMouseLeave={() => { setSelectedColor(undefined); }}
+            style={{ cursor: 'pointer' }}
+          >
+            <rect
+              x={(i * (graphWidth - 50)) / COLOR_SCALES.Divergent.Color4.length + 1}
+              y={1}
+              width={((graphWidth - 50) / COLOR_SCALES.Divergent.Color4.length) - 2}
+              height={8}
+              fill={d}
+              stroke={selectedColor === d ? '#212121' : d}
+            />
+            <text
+              x={((i * (graphWidth - 50)) / COLOR_SCALES.Divergent.Color4.length) + (((graphWidth - 50) / 2) / COLOR_SCALES.Divergent.Color4.length)}
+              y={25}
+              textAnchor='middle'
+              fontSize={12}
+              fill='#212121'
+            >
+              {HDI_LEVELS[i]}
+            </text>
+          </g>
+        )) : colorDomain.map((d, i) => (
+          <g
+            transform='translate(0,20)'
+            key={i}
+            onMouseOver={() => { setSelectedColor(colorList[i]); }}
+            onMouseLeave={() => { setSelectedColor(undefined); }}
+            style={{ cursor: 'pointer' }}
+          >
+            <rect
+              x={(i * (graphWidth - 50)) / colorDomain.length + 1}
+              y={1}
+              width={((graphWidth - 50) / colorDomain.length) - 2}
+              height={8}
+              fill={colorList[i]}
+              stroke={selectedColor === colorList[i] ? '#212121' : colorList[i]}
+            />
+            <text
+              x={((i * (graphWidth - 50)) / colorDomain.length) + (((graphWidth - 50) / 2) / colorDomain.length)}
+              y={25}
+              textAnchor='middle'
+              fontSize={12}
+              fill='#212121'
+            >
+              {d}
+            </text>
+          </g>
+        ))
+      }
           <g
             transform='translate(0,20)'
           >
@@ -284,7 +279,7 @@ export const HorizontalBarChart = (props: Props) => {
           }
           {
             dataFormatted.map((d, i) => {
-              const countryData = data[data.findIndex((el) => el['Alpha-3 code-1'] === d.countryCode)];
+              const countryData = data[data.findIndex((el) => el['Alpha-3 code'] === d.countryCode)];
               const selectedColorOpacity = d.colorVal !== undefined ? !selectedColor || selectedColor === colorScale(d.colorVal) as string : !selectedColor;
               const rowData: HoverRowDataType[] = [
                 {
@@ -343,7 +338,7 @@ export const HorizontalBarChart = (props: Props) => {
                     fill={d.colorVal ? colorScale(d.colorVal) : '#212121'}
                     y={i * 25}
                     x={0}
-                    dx={-50}
+                    dx={-15}
                     dy={14}
                     fontSize={12}
                     textAnchor='end'
@@ -388,6 +383,6 @@ export const HorizontalBarChart = (props: Props) => {
       {
         hoverData ? <Tooltip data={hoverData} /> : null
       }
-    </El>
+    </div>
   );
 };

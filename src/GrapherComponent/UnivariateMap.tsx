@@ -10,7 +10,7 @@ import maxBy from 'lodash.maxby';
 import max from 'lodash.max';
 import { scaleThreshold, scaleOrdinal, scaleSqrt } from 'd3-scale';
 import {
-  CtxDataType, DataType, HoverDataType, HoverRowDataType, IndicatorMetaDataWithYear,
+  CountryGroupDataType, CtxDataType, HoverDataType, HoverRowDataType, IndicatorMetaDataWithYear,
 } from '../Types';
 import Context from '../Context/Context';
 import World from '../Data/worldMap.json';
@@ -18,40 +18,28 @@ import { COLOR_SCALES } from '../Constants';
 import { Tooltip } from '../Components/Tooltip';
 
 interface Props {
-  data: DataType[];
+  data: CountryGroupDataType[];
   indicators: IndicatorMetaDataWithYear[];
 }
 
-const El = styled.div`
-  height: calc(100% - 71px);
-  overflow-y: hidden;
-`;
-
 const LegendEl = styled.div`
-  padding: 1rem 1rem 0 1rem;
-  background-color:rgba(255,255,255,0.1);
-  box-shadow: var(--shadow);
-  width: 32rem;
-  margin-left: 1rem;
-  margin-top: -2rem;
+  padding: 0.75rem 0.75rem 0 0.75rem;
+  background-color: rgba(255,255,255, 0.75);
+  width: 20rem;
+  margin-left: 0.75rem;
+  margin-top: -1.25rem;
   position: relative;
-  z-index: 1000;
+  z-index: 5;
   @media (min-width: 961px) {
     transform: translateY(-100%);
   }
 `;
 
-const TitleEl = styled.div`
-  font-size: 1.2rem;
-  font-weight: bold;
+const TitleEl = styled.h6`
   width: 100%;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-`;
-
-const G = styled.g`
-  pointer-events: none;
 `;
 
 export const UnivariateMap = (props: Props) => {
@@ -106,12 +94,16 @@ export const UnivariateMap = (props: Props) => {
     mapSvgSelect.call(zoomBehaviour as any);
   }, [svgHeight, svgWidth]);
   return (
-    <El>
+    <div style={{
+      height: 'calc(100% - 89px)',
+      overflowY: 'hidden',
+    }}
+    >
       <svg width='100%' height='100%' viewBox={`0 0 ${svgWidth} ${svgHeight}`} ref={mapSvg}>
         <g ref={mapG}>
           {
             (World as any).features.map((d: any, i: number) => {
-              const index = data.findIndex((el: any) => el['Alpha-3 code-1'] === d.properties.ISO3);
+              const index = data.findIndex((el: any) => el['Alpha-3 code'] === d.properties.ISO3);
               if ((index !== -1) || d.properties.NAME === 'Antarctica') return null;
               return (
                 <g
@@ -163,11 +155,11 @@ export const UnivariateMap = (props: Props) => {
           }
           {
             data.map((d, i: number) => {
-              const index = (World as any).features.findIndex((el: any) => d['Alpha-3 code-1'] === el.properties.ISO3);
+              const index = (World as any).features.findIndex((el: any) => d['Alpha-3 code'] === el.properties.ISO3);
               const indicatorIndex = d.indicators.findIndex((el) => xIndicatorMetaData.DataKey === el.indicator);
               const val = indicatorIndex === -1 ? undefined
-                : year !== -1 && !showMostRecentData ? d.indicators[indicatorIndex]?.yearlyData[d.indicators[indicatorIndex]?.yearlyData.findIndex((el) => el.year === year)]?.value
-                  : d.indicators[indicatorIndex]?.yearlyData[d.indicators[indicatorIndex]?.yearlyData.length - 1]?.value;
+                : year !== -1 && !showMostRecentData ? d.indicators[indicatorIndex].yearlyData[d.indicators[indicatorIndex].yearlyData.findIndex((el) => el.year === year)]?.value
+                  : d.indicators[indicatorIndex].yearlyData[d.indicators[indicatorIndex].yearlyData.length - 1]?.value;
               const color = val !== undefined ? colorScale(xIndicatorMetaData.IsCategorical ? Math.floor(val) : val) : COLOR_SCALES.Null;
 
               const regionOpacity = selectedRegions.length === 0 || selectedRegions.indexOf(d['Group 2']) !== -1;
@@ -180,7 +172,7 @@ export const UnivariateMap = (props: Props) => {
                   title: xAxisIndicator,
                   value: val === undefined ? 'NA' : val,
                   type: 'color',
-                  year: year === -1 || showMostRecentData ? d.indicators[indicatorIndex]?.yearlyData[d.indicators[indicatorIndex]?.yearlyData.length - 1]?.year : year,
+                  year: indicatorIndex === -1 ? undefined : year === -1 || showMostRecentData ? d.indicators[indicatorIndex].yearlyData[d.indicators[indicatorIndex].yearlyData.length - 1]?.year : year,
                   color,
                   prefix: xIndicatorMetaData?.LabelPrefix,
                   suffix: xIndicatorMetaData?.LabelSuffix,
@@ -189,15 +181,15 @@ export const UnivariateMap = (props: Props) => {
               if (sizeIndicatorMetaData) {
                 const sizeIndicatorIndex = d.indicators.findIndex((el) => sizeIndicatorMetaData?.DataKey === el.indicator);
                 const sizeVal = sizeIndicatorIndex === -1 ? undefined
-                  : year !== -1 && !showMostRecentData ? d.indicators[sizeIndicatorIndex]?.yearlyData[d.indicators[sizeIndicatorIndex]?.yearlyData.findIndex((el) => el.year === year)]?.value
-                    : d.indicators[sizeIndicatorIndex]?.yearlyData[d.indicators[sizeIndicatorIndex]?.yearlyData.length - 1]?.value;
+                  : year !== -1 && !showMostRecentData ? d.indicators[sizeIndicatorIndex].yearlyData[d.indicators[sizeIndicatorIndex].yearlyData.findIndex((el) => el.year === year)]?.value
+                    : d.indicators[sizeIndicatorIndex].yearlyData[d.indicators[sizeIndicatorIndex].yearlyData.length - 1]?.value;
                 rowData.push({
                   title: sizeIndicator,
                   value: sizeVal !== undefined ? sizeVal : 'NA',
                   type: 'size',
                   prefix: sizeIndicatorMetaData?.LabelPrefix,
                   suffix: sizeIndicatorMetaData?.LabelSuffix,
-                  year: year === -1 || showMostRecentData ? d.indicators[sizeIndicatorIndex]?.yearlyData[d.indicators[sizeIndicatorIndex]?.yearlyData.length - 1]?.year : year,
+                  year: sizeIndicatorIndex === -1 ? undefined : year === -1 || showMostRecentData ? d.indicators[sizeIndicatorIndex].yearlyData[d.indicators[sizeIndicatorIndex].yearlyData.length - 1]?.year : year,
                 });
               }
               return (
@@ -276,8 +268,9 @@ export const UnivariateMap = (props: Props) => {
           }
           {
             hoverData
-              ? (World as any).features.filter((d: any) => d.properties.ISO3 === data[data.findIndex((el: DataType) => el['Country or Area'] === hoverData?.country)]['Alpha-3 code-1']).map((d: any) => (
-                <G
+              ? (World as any).features.filter((d: any) => d.properties.ISO3 === data[data.findIndex((el) => el['Country or Area'] === hoverData?.country)]['Alpha-3 code']).map((d: any) => (
+                <g
+                  style={{ pointerEvents: 'none' }}
                   opacity={!selectedColor ? 1 : 0}
                 >
                   {
@@ -323,7 +316,7 @@ export const UnivariateMap = (props: Props) => {
                       );
                     })
                   }
-                </G>
+                </g>
               )) : null
           }
           {
@@ -352,7 +345,7 @@ export const UnivariateMap = (props: Props) => {
                         title: xAxisIndicator,
                         value: val === undefined ? 'NA' : val,
                         type: 'color',
-                        year: year === -1 || showMostRecentData ? d.indicators[indicatorIndex]?.yearlyData[d.indicators[indicatorIndex]?.yearlyData.length - 1]?.year : year,
+                        year: indicatorIndex === -1 ? undefined : year === -1 || showMostRecentData ? d.indicators[indicatorIndex].yearlyData[d.indicators[indicatorIndex].yearlyData.length - 1]?.year : year,
                         color,
                         prefix: xIndicatorMetaData?.LabelPrefix,
                         suffix: xIndicatorMetaData?.LabelSuffix,
@@ -365,7 +358,7 @@ export const UnivariateMap = (props: Props) => {
                         type: 'size',
                         prefix: sizeIndicatorMetaData?.LabelPrefix,
                         suffix: sizeIndicatorMetaData?.LabelSuffix,
-                        year: year === -1 || showMostRecentData ? d.indicators[sizeIndicatorIndex]?.yearlyData[d.indicators[sizeIndicatorIndex]?.yearlyData.length - 1]?.year : year,
+                        year: sizeIndicatorIndex === -1 ? undefined : year === -1 || showMostRecentData ? d.indicators[sizeIndicatorIndex].yearlyData[d.indicators[sizeIndicatorIndex].yearlyData.length - 1]?.year : year,
                       });
                     }
                     return (
@@ -418,8 +411,8 @@ export const UnivariateMap = (props: Props) => {
         {
           sizeIndicator
             ? (
-              <>
-                <TitleEl>{sizeIndicatorMetaData.IndicatorLabelTable}</TitleEl>
+              <div className='margin-bottom-07'>
+                <TitleEl className='undp-typography margin-bottom-03'>{sizeIndicatorMetaData.IndicatorLabelTable}</TitleEl>
                 <svg width='135' height='90' viewBox='0 0 175 100' fill='none' xmlns='http://www.w3.org/2000/svg'>
                   <text fontSize={12} fontWeight={700} textAnchor='middle' fill='#212121' x={4} y={95}>0</text>
                   <text fontSize={12} fontWeight={700} textAnchor='middle' fill='#212121' x={130} y={95}>{format('~s')(radiusScale.invert(40))}</text>
@@ -427,12 +420,12 @@ export const UnivariateMap = (props: Props) => {
                   <circle cx='4' cy='41' r='0.25' fill='white' stroke='#212121' strokeWidth='2' />
                   <circle cx='130' cy='41' r='40' fill='white' stroke='#212121' strokeWidth='2' />
                 </svg>
-              </>
+              </div>
             )
             : null
         }
-        <TitleEl>{xIndicatorMetaData.IndicatorLabelTable}</TitleEl>
-        <svg width='100%' viewBox={`0 0 ${320} ${30}`}>
+        <TitleEl className='undp-typography margin-bottom-03'>{xIndicatorMetaData.IndicatorLabelTable}</TitleEl>
+        <svg width='100%' viewBox='0 0 320 30'>
           <g>
             {
               valueArray.map((d, i) => (
@@ -487,6 +480,6 @@ export const UnivariateMap = (props: Props) => {
       {
         hoverData ? <Tooltip data={hoverData} /> : null
       }
-    </El>
+    </div>
   );
 };

@@ -1,180 +1,21 @@
 /* eslint-disable jsx-a11y/iframe-has-title */
 import { useState, useEffect, useReducer } from 'react';
-import styled, { createGlobalStyle } from 'styled-components';
+import styled from 'styled-components';
 import { json } from 'd3-request';
-import { nest } from 'd3-collection';
-import sortBy from 'lodash.sortby';
 import uniqBy from 'lodash.uniqby';
 import { queue } from 'd3-queue';
-import { Spin } from 'antd';
-import 'antd/dist/antd.css';
+import flattenDeep from 'lodash.flattendeep';
+import sortedUniq from 'lodash.sorteduniq';
 import {
-  DataType, CountryGroupDataType, IndicatorMetaDataType, IndicatorMetaDataWithYear,
+  CountryGroupDataType, CountryListType, IndicatorMetaDataType, IndicatorMetaDataWithYear,
 } from './Types';
 import { GrapherComponent } from './GrapherComponent';
 import Reducer from './Context/Reducer';
 import Context from './Context/Context';
-import { DEFAULT_VALUES, DATASOURCELINK } from './Constants';
-import ILOData from './Data/ILOData.json';
-import WBData from './Data/WBFinalData.json';
-import { DonutChartCard } from './Components/DonutChartCard';
+import {
+  DEFAULT_VALUES, DATALINK, METADATALINK,
+} from './Constants';
 import { MultiDonutChartCard } from './Components/MultiDonutChartCard';
-
-const GlobalStyle = createGlobalStyle`
-  :root {
-    --white: #FFFFFF;
-    --primary-blue: #006EB5;
-    --blue-medium: #4F95DD;
-    --blue-bg: #94C4F5;
-    --navy: #082753;
-    --black-100: #FAFAFA;
-    --black-200: #f5f9fe;
-    --black-300: #EDEFF0;
-    --black-400: #E9ECF6;
-    --black-450: #DDD;
-    --black-500: #A9B1B7;
-    --black-550: #666666;
-    --black-600: #212121;
-    --black-700: #000000;
-    --blue-very-light: #F2F7FF;
-    --yellow: #FBC412;
-    --yellow-bg: #FFE17E;
-    --red: #D12800;
-    --red-bg: #FFBCB7;
-    --shadow:0px 10px 30px -10px rgb(9 105 250 / 15%);
-    --shadow-bottom: 0 10px 13px -3px rgb(9 105 250 / 5%);
-    --shadow-top: 0 -10px 13px -3px rgb(9 105 250 / 15%);
-    --shadow-right: 10px 0px 13px -3px rgb(9 105 250 / 5%);
-    --shadow-left: -10px 0px 13px -3px rgb(9 105 250 / 15%);
-  }
-  
-  html { 
-    font-size: 62.5%; 
-  }
-
-  .react-dropdown-select-option{
-    color:var(--black) !important;
-    background-color:var(--primary-color-light) !important;
-  }
-  .react-dropdown-select-option-label, .react-dropdown-select-option-remove{
-    font-weight: 400;
-    background-color:var(--primary-color-light);
-    padding: 0.5rem;
-  }
-
-  body {
-    font-family: "proxima-nova", "Helvetica Neue", "sans-serif";
-    color: var(--black-600);
-    background-color: var(--white);
-    margin: 0;
-    padding: 1rem 0;
-    font-size: 1.6rem;
-    font-weight: normal;
-    line-height: 2.56rem;
-  }
-
-  a {
-    text-decoration: none;
-    color: var(--primary-blue);
-  }
-
-  h1 {
-    color: var(--primary-blue);
-    font-size: 3.2rem;
-    font-weight: 700;
-    
-    @media (max-width: 760px) {
-      font-size: 2.4rem;
-    }
-    @media (max-width: 480px) {
-      font-size: 1.8rem;
-    }
-  }
-  
-  button.primary {
-    border-radius: 0.2rem !important;
-    font-size: 1.4rem !important;
-    font-weight: normal !important;
-    color: var(--white) !important;
-    background-color: var(--primary-blue) !important;
-    border: 1px solid var(--primary-blue) !important;
-    cursor: pointer !important;
-    padding: 0.4rem 1rem !important;
-    &:hover {
-      border: 1px solid var(--blue-medium) !important;
-      background-color: var(--blue-medium) !important;
-    }
-    &:active{
-      border: 1px solid var(--blue-medium) !important;
-      background-color: var(--blue-medium) !important;
-    }
-  }
-
-  button.secondary {
-    border-radius: 0.2rem !important;
-    font-size: 1.4rem !important;
-    font-weight: normal !important;
-    color: var(--black-600) !important;
-    border: 1px solid var(--black-450) !important;
-    cursor: pointer !important;
-    padding: 0.4rem 1rem !important;
-    background-color: var(--white) !important;
-    &:hover {
-      border: 1px solid var(--primary-blue) !important;
-      color: var(--primary-blue) !important;
-    }
-    &:active{
-      border: 1px solid var(--primary-blue) !important;
-      color: var(--primary-blue) !important;
-    }
-  }
-
-  a:hover {
-    font-weight: bold;
-  }
-
-  .bold{
-    font-weight: 700;
-  }
-  
-  .italics{
-    font-style: italic;
-  }
-
-  .ant-modal-close {
-    display: none !important;
-  }
-
-  .ant-select-item-option-content {
-    white-space: normal;
-  }
-
-  .ant-select-selector {
-    border-radius: 0.5rem !important;
-    background-color: var(--black-200) !important;
-  }
-  .ant-slider-mark-text {
-    font-size: 1rem !important;
-    display: none;
-    &:first-of-type {
-      display: inline;
-    }
-    &:last-of-type {
-      display: inline;
-    }
-  }
-  .ant-slider-tooltip{
-    padding: 0 !important;
-  }
-  .ant-tooltip-inner{
-    font-size: 1.4rem !important;
-    background-color: var(--black-550) !important;
-    border-radius: 0.4rem;
-  }
-  .ant-tooltip-arrow-content{
-    background-color: var(--black-550) !important;
-  }
-`;
 
 const VizAreaEl = styled.div`
   display: flex;
@@ -185,67 +26,11 @@ const VizAreaEl = styled.div`
   height: 10rem;
 `;
 
-const CardContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: wrap;
-  width: 100%;
-  max-width: 128rem;
-  margin: auto;
-`;
-
-const CardEl = styled.div`
-  width: calc(33% - 1rem);
-  color: #110848;
-  text-align: center;
-  font-weight: bold;
-  background-color: #f3f7fe;
-  padding: 2rem;
-  @media (max-width: 560px) {
-    width: 100%;
-    margin-bottom: 2rem;
-  }  
-`;
-
-const CardFullWidthEl = styled.div`
-  width: 100%;
-  max-width: 128rem;
-  color: #110848;
-  text-align: center;
-  font-weight: bold;
-  background-color: #f3f7fe;
-  padding: 2rem;
-  margin: 2rem auto 0 auto;
-  @media (max-width: 560px) {
-    margin: 0 auto 0 auto;
-  }  
-`;
-
-const DataPointEl = styled.div`
-  font-weight: bold;
-  font-size: 4.8rem;
-  margin: 6rem 0 0 0;
-`;
-
-const MultiDonutEl = styled.div`
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: space-between;
-`;
-
-const WBIndicators = [
-  'Employment outside the formal sector (% of total employment; International Labour Organization; hamonized series)',
-  'Dynamic general equilibrium model-based (DGE) estimates of informal output (% of official GDP)',
-  'Percent of firms competing against unregistered or informal firms (World Bank Enterprise Surveys)',
-  'Percent of firms formally registered when they started operations in the country (World Bank Enterprise Surveys)',
-  'Number of years firm operated without formal registration (World Bank Enterprise Surveys)',
-];
-
 const App = () => {
-  const [finalData, setFinalData] = useState<DataType[] | undefined>(undefined);
+  const [finalData, setFinalData] = useState<CountryGroupDataType[] | undefined>(undefined);
   const [indicatorsList, setIndicatorsList] = useState<IndicatorMetaDataWithYear[] | undefined>(undefined);
   const [regionList, setRegionList] = useState<string[] | undefined>(undefined);
-  const [countryList, setCountryList] = useState<string[] | undefined>(undefined);
+  const [countryList, setCountryList] = useState<CountryListType[] | undefined>(undefined);
   const queryParams = new URLSearchParams(window.location.search);
   const initialState = {
     graphType: queryParams.get('graphType') || 'scatterPlot',
@@ -396,187 +181,82 @@ const App = () => {
 
   useEffect(() => {
     queue()
-      .defer(json, `${DATASOURCELINK}/data/ALL-DATA.json`)
-      .defer(json, 'https://raw.githubusercontent.com/UNDP-Data/InformalEconomy-Indicator-MetaData/main/indicatorMetaData.json')
-      .defer(json, 'https://raw.githubusercontent.com/UNDP-Data/Country-Taxonomy/main/country-territory-groups.json')
-      .await((err: any, data: any[], indicatorMetaData: IndicatorMetaDataType[], countryGroupData: CountryGroupDataType[]) => {
+      .defer(json, DATALINK)
+      .defer(json, METADATALINK)
+      .await((err: any, data: CountryGroupDataType[], indicatorMetaData: IndicatorMetaDataType[]) => {
         if (err) throw err;
-        const dataWithYear = data.map((d: any) => {
-          const Year = new Date(d.Year).getFullYear();
-          return { ...d, Year };
-        });
-
-        const groupedData = nest()
-          .key((d: any) => d['Alpha-3 code'])
-          .entries(dataWithYear);
-        const indicators: string[] = [];
-        dataWithYear.forEach((d: any) => {
-          const keys = Object.keys(d);
-          keys.forEach((key) => {
-            if (indicators.indexOf(key) === -1 && key !== 'Alpha-3 code' && key !== 'Country or Area' && key !== 'Year') { indicators.push(key); }
+        setFinalData(data);
+        setCountryList(data.map((d) => ({ name: d['Country or Area'], code: d['Alpha-3 code'] })));
+        setRegionList(uniqBy(data, (d) => d['Group 2']).map((d) => d['Group 2']));
+        const indicatorsFiltered = indicatorMetaData.filter((d) => d.SSTopics.indexOf('Informal Economy Facility') !== -1);
+        const indicatorWithYears: IndicatorMetaDataWithYear[] = indicatorsFiltered.map((d) => {
+          const years: number[][] = [];
+          data.forEach((el) => {
+            const indYears = el.indicators[el.indicators.findIndex((ind) => ind.indicator === d.DataKey)]?.yearlyData.map((year) => year.year);
+            if (indYears) years.push(indYears);
           });
-        });
-        const countryIndicatorObj = indicators.map((d: string) => {
-          const yearList: number[] = [];
-          dataWithYear.forEach((el: any) => {
-            if (el[d] && yearList.indexOf(el.Year) === -1) {
-              yearList.push(el.Year);
-            }
-          });
-          return ({
-            indicator: d,
-            yearAvailable: sortBy(yearList),
-            yearlyData: sortBy(yearList).map((year) => ({
-              year,
-              value: undefined,
-            })),
-          });
-        });
-        const countryData = groupedData.map((d) => {
-          const countryGroup = countryGroupData[countryGroupData.findIndex((el) => el['Alpha-3 code-1'] === d.key)];
-          const indTemp = countryIndicatorObj.map((indicatorObj) => {
-            const yearlyData = indicatorObj.yearlyData.map((year) => {
-              const indx = d.values.findIndex((val: { Year: string; }) => parseInt(val.Year, 10) === year.year);
-              const value: undefined | number = indx !== -1 ? d.values[indx][indicatorObj.indicator] : undefined;
-              return (
-                {
-                  ...year,
-                  value,
-                }
-              );
-            }).filter((val) => val.value !== undefined);
-            return (
-              {
-                ...indicatorObj,
-                yearlyData,
-              }
-            );
-          });
-          return ({
-            ...countryGroup,
-            indicatorAvailable: indTemp.map((ind) => ind.indicator),
-            indicators: indTemp,
-          });
-        });
-        ILOData.forEach((d) => {
-          if (countryData.findIndex((el) => el['Country or Area'] === d['Country or Area']) !== -1) {
-            d.indicators.forEach((indicator) => {
-              countryData[countryData.findIndex((el) => el['Country or Area'] === d['Country or Area'])].indicators.push(indicator);
-              countryData[countryData.findIndex((el) => el['Country or Area'] === d['Country or Area'])].indicatorAvailable.push(indicator.indicator);
-            });
-          } else {
-            // eslint-disable-next-line no-console
-            console.log(d['Country or Area']);
-          }
-        });
-        WBData.forEach((d) => {
-          if (countryData.findIndex((el) => el['Alpha-3 code-1'] === d['Country or Area']) !== -1) {
-            d.indicators.forEach((indicator) => {
-              countryData[countryData.findIndex((el) => el['Alpha-3 code-1'] === d['Country or Area'])].indicators.push(indicator);
-              countryData[countryData.findIndex((el) => el['Alpha-3 code-1'] === d['Country or Area'])].indicatorAvailable.push(indicator.indicator);
-            });
-          } else {
-            // eslint-disable-next-line no-console
-            console.log(d['Country or Area']);
-          }
-        });
-        setFinalData(countryData);
-        setCountryList(countryData.map((d) => d['Country or Area']));
-        setRegionList(uniqBy(countryData, (d) => d['Group 2']).map((d) => d['Group 2']));
-        ILOData[0].indicators.forEach((d) => {
-          const yearlyData = d.yearAvailable.map((el) => ({
-            year: el,
-            value: undefined,
-          }));
-          countryIndicatorObj.push({ ...d, yearlyData });
-        });
-        WBIndicators.forEach((d) => {
-          const yearAvailable: number[] = [];
-          for (let i = 1990; i < 2019; i += 1) {
-            yearAvailable.push(i);
-          }
-          const yearlyData = yearAvailable.map((el) => ({
-            year: el,
-            value: undefined,
-          }));
-          const obj = {
-            indicator: d,
-            yearAvailable,
-            yearlyData,
+          return {
+            ...d,
+            years: sortedUniq(flattenDeep(years).sort()),
           };
-          countryIndicatorObj.push(obj);
         });
-        const indicatorWithYears: IndicatorMetaDataWithYear[] = indicatorMetaData.map((d) => ({
-          ...d,
-          years: countryIndicatorObj[countryIndicatorObj.findIndex((el) => el.indicator === d.DataKey)].yearAvailable,
-        }));
         setIndicatorsList(indicatorWithYears);
       });
   }, []);
   return (
     <>
-      <GlobalStyle />
-      {
-        queryParams.get('showTopStats') !== 'false'
-          ? (
-            <>
-              <CardContainer>
-                <CardEl>
-                  Informal economy absorbs
-                  <DonutChartCard
-                    data={80}
-                  />
-                  of enterprises in the world
-                </CardEl>
-                <CardEl>
-                  People working in the informal economy
-                  <DataPointEl>
-                    2 Billion
-                  </DataPointEl>
-                </CardEl>
-                <CardEl>
-                  Percentage of the
-                  {' '}
-                  {'world\'s'}
-                  {' '}
-                  employed population in the informal economy
-                  <DonutChartCard
-                    data={60}
-                  />
-                </CardEl>
-              </CardContainer>
-              <CardFullWidthEl>
-                Share of informal employment in total employment by:
-                <MultiDonutEl>
-                  <MultiDonutChartCard
-                    data={[66, 58.1]}
-                    keys={['Male', 'Female']}
-                    colors={['#00C4AA', '#8700F9']}
-                    titleText='Gender'
-                  />
-                  <MultiDonutChartCard
-                    data={[77.1, 58.7]}
-                    keys={['15-24 Yrs', '25+ Yrs']}
-                    titleText='Age'
-                    colors={['#41b6c4', '#253494']}
-                  />
-                  <MultiDonutChartCard
-                    data={[93.8, 84.6, 51.7, 23.8]}
-                    keys={['No Edu.', 'Primary', 'Secondary', 'Tertiary']}
-                    titleText='Education'
-                    colors={['#d7191c', '#fdae61', '#abdda4', '#2b83ba']}
-                  />
-                  <MultiDonutChartCard
-                    data={[80, 43.7]}
-                    keys={['Rural', 'Urban']}
-                    titleText='Area of Residence'
-                    colors={['#4daf4a', '#377eb8']}
-                  />
-                </MultiDonutEl>
-              </CardFullWidthEl>
-            </>
-          ) : null
-      }
+      <div className='undp-container'>
+        {
+          queryParams.get('showTopStats') !== 'false'
+            ? (
+              <>
+                <div className='stat-card-container margin-bottom-05'>
+                  <div className='stat-card' style={{ width: 'calc(33.33% - 4.67rem)' }}>
+                    <h3>80%</h3>
+                    <h4>Of enterprises in the world absorbed by Informal Economy</h4>
+                  </div>
+                  <div className='stat-card' style={{ width: 'calc(33.33% - 4.67rem)' }}>
+                    <h3>2 Billion</h3>
+                    <h4>People working in the informal economy</h4>
+                  </div>
+                  <div className='stat-card' style={{ width: 'calc(33.33% - 4.67rem)' }}>
+                    <h3>60%</h3>
+                    <h4>Of world&apos;s employed population in the informal economy</h4>
+                  </div>
+                </div>
+                <div className='stat-card margin-bottom-05' style={{ width: 'calc(100% - 4rem)' }}>
+                  <h6 className='undp-typography' style={{ textAlign: 'center' }}>Share of informal employment in total employment by:</h6>
+                  <div className='flex-div flex-wrap flex-space-between flex-vert-align-center'>
+                    <MultiDonutChartCard
+                      data={[66, 58.1]}
+                      keys={['Male', 'Female']}
+                      colors={['#00C4AA', '#8700F9']}
+                      titleText='Gender'
+                    />
+                    <MultiDonutChartCard
+                      data={[77.1, 58.7]}
+                      keys={['15-24 Yrs', '25+ Yrs']}
+                      titleText='Age'
+                      colors={['#41b6c4', '#253494']}
+                    />
+                    <MultiDonutChartCard
+                      data={[93.8, 84.6, 51.7, 23.8]}
+                      keys={['No Edu.', 'Primary', 'Secondary', 'Tertiary']}
+                      titleText='Education'
+                      colors={['#d7191c', '#fdae61', '#abdda4', '#2b83ba']}
+                    />
+                    <MultiDonutChartCard
+                      data={[80, 43.7]}
+                      keys={['Rural', 'Urban']}
+                      titleText='Area of Residence'
+                      colors={['#4daf4a', '#377eb8']}
+                    />
+                  </div>
+                </div>
+              </>
+            ) : null
+        }
+      </div>
       {
         queryParams.get('showVizTool') !== 'false' ? (
           <>
@@ -607,18 +287,20 @@ const App = () => {
                         updateBarLayout,
                       }}
                     >
-                      <GrapherComponent
-                        data={finalData}
-                        indicators={indicatorsList}
-                        regions={regionList}
-                        countries={countryList}
-                      />
+                      <div className='undp-container'>
+                        <GrapherComponent
+                          data={finalData}
+                          indicators={indicatorsList}
+                          regions={regionList}
+                          countries={countryList}
+                        />
+                      </div>
                     </Context.Provider>
                   </>
                 )
                 : (
-                  <VizAreaEl>
-                    <Spin size='large' />
+                  <VizAreaEl className='undp-container'>
+                    <div className='undp-loader' />
                   </VizAreaEl>
                 )
             }
