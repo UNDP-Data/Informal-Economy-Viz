@@ -25,8 +25,12 @@ const VizAreaEl = styled.div`
   justify-content: center;
   height: 10rem;
 `;
+interface Props {
+  isEmbeded: boolean
+}
 
-const App = () => {
+const App = (props:Props) => {
+  const { isEmbeded } = props;
   const [finalData, setFinalData] = useState<CountryGroupDataType[] | undefined>(undefined);
   const [indicatorsList, setIndicatorsList] = useState<IndicatorMetaDataWithYear[] | undefined>(undefined);
   const [regionList, setRegionList] = useState<string[] | undefined>(undefined);
@@ -224,7 +228,7 @@ const App = () => {
                     <h4>Of world&apos;s employed population in the informal economy</h4>
                   </div>
                 </div>
-                <div className='stat-card margin-bottom-05' style={{ width: 'calc(100% - 4rem)' }}>
+                <div className='stat-card margin-bottom-09'>
                   <h6 className='undp-typography' style={{ textAlign: 'center' }}>Share of informal employment in total employment by:</h6>
                   <div className='flex-div flex-wrap flex-space-between flex-vert-align-center'>
                     <MultiDonutChartCard
@@ -293,6 +297,7 @@ const App = () => {
                           indicators={indicatorsList}
                           regions={regionList}
                           countries={countryList}
+                          isEmbeded={isEmbeded}
                         />
                       </div>
                     </Context.Provider>

@@ -14,11 +14,18 @@ const getEl = (embedSelector: string) => {
   }
   return embedSelector;
 };
+const container = getEl('[data-bucket]');
 
-const container = getEl('[data-bucket-embed]');
-const root = createRoot(container!); // createRoot(container!) if you use TypeScript
+if (container) {
+  const root = createRoot(container!); // createRoot(container!) if you use TypeScript
+  root.render(<App isEmbeded={false} />);
+}
 
-root.render(<App />);
+const containerEmbeded = getEl('[data-bucket-embed]');
+if (containerEmbeded) {
+  const rootEmbeded = createRoot(containerEmbeded!); // createRoot(container!) if you use TypeScript
+  rootEmbeded.render(<App isEmbeded />);
+}
 
 // If you want to start measuring performance in your app, pass a function
 // to log results (for example: reportWebVitals(console.log))
