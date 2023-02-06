@@ -25,12 +25,8 @@ const VizAreaEl = styled.div`
   justify-content: center;
   height: 10rem;
 `;
-interface Props {
-  isEmbeded: boolean
-}
 
-const App = (props:Props) => {
-  const { isEmbeded } = props;
+const App = () => {
   const [finalData, setFinalData] = useState<CountryGroupDataType[] | undefined>(undefined);
   const [indicatorsList, setIndicatorsList] = useState<IndicatorMetaDataWithYear[] | undefined>(undefined);
   const [regionList, setRegionList] = useState<string[] | undefined>(undefined);
@@ -297,7 +293,6 @@ const App = (props:Props) => {
                           indicators={indicatorsList}
                           regions={regionList}
                           countries={countryList}
-                          isEmbeded={isEmbeded}
                         />
                       </div>
                     </Context.Provider>

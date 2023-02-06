@@ -34,8 +34,6 @@ const ErrorNote = styled.div`
   background-color: var(--white);
   border: 1px solid var(--dark-red);
   position: relative;
-  top: 50%;
-  transform: translateY(-50%);
 `;
 
 const InfoNote = styled.div`
@@ -46,8 +44,6 @@ const InfoNote = styled.div`
   background-color: var(--white);
   border: 1px solid var(--gray-300);
   position: relative;
-  top: 50%;
-  transform: translateY(-50%);
 `;
 
 export const LineChart = (props: Props) => {
@@ -61,7 +57,6 @@ export const LineChart = (props: Props) => {
     trendChartCountry,
     updateTrendChartCountry,
     showLabel,
-    selectedCountry,
   } = useContext(Context) as CtxDataType;
   const [hoverData, setHoverData] = useState<HoverDataType | undefined>(undefined);
   const queryParams = new URLSearchParams(window.location.search);
@@ -78,7 +73,7 @@ export const LineChart = (props: Props) => {
 
   const xIndicatorMetaData = indicators[indicators.findIndex((indicator) => indicator.IndicatorLabelTable === xAxisIndicator)];
 
-  const countryData = selectedCountry ? data[data.findIndex((d) => d['Alpha-3 code'] === selectedCountry)] : data[data.findIndex((d) => d['Country or Area'] === trendChartCountry)];
+  const countryData = data[data.findIndex((d) => d['Country or Area'] === trendChartCountry)];
 
   const minYear = xIndicatorMetaData.years[0];
   const maxYear = xIndicatorMetaData.years[xIndicatorMetaData.years.length - 1];
@@ -117,15 +112,14 @@ export const LineChart = (props: Props) => {
       : (maxYearFiltered as number) - (minYearFiltered as number),
   );
   return (
-    <div style={{ height: '100%', overflowY: 'hidden' }}>
+    <>
       <div style={{ padding: 'var(--spacing-06)', backgroundColor: 'var(--white)', borderBottom: '1px solid var(--gray-400)' }}>
         <Select
           showSearch
           className='undp-select'
           placeholder='Please select a country'
           onChange={(d) => { updateTrendChartCountry(d); }}
-          disabled={selectedCountry !== undefined}
-          value={countries[countries.findIndex((d) => d.code === selectedCountry)].name || trendChartCountry}
+          value={trendChartCountry}
         >
           {
             countries.map((d) => d.name).map((d) => (
@@ -134,9 +128,9 @@ export const LineChart = (props: Props) => {
           }
         </Select>
       </div>
-      <div style={{ height: 'calc(100% - 89px)' }}>
+      <>
         {
-          (trendChartCountry || selectedCountry) && dataFilterd.length > 0
+          trendChartCountry && dataFilterd.length > 0
             ? (
               <svg width='100%' height='100%' viewBox={`0 0 ${svgWidth} ${svgHeight}`}>
                 <g transform={`translate(${margin.left},${margin.top})`}>
@@ -318,7 +312,7 @@ export const LineChart = (props: Props) => {
             ) : null
         }
         {
-          !trendChartCountry && !selectedCountry ? (
+          !trendChartCountry ? (
             <InfoNote>
               <h5 className='undp-typography'>Please select a country to see the trend for that country</h5>
               <Select
@@ -346,10 +340,10 @@ export const LineChart = (props: Props) => {
             </ErrorNote>
           ) : null
         }
-      </div>
+      </>
       {
         hoverData ? <Tooltip data={hoverData} /> : null
       }
-    </div>
+    </>
   );
 };

@@ -25,39 +25,26 @@ interface DataFormattedType {
   param2?: number;
 }
 
-const El = styled.div`
-  height: 100%;
-  overflow-y: hidden;
-`;
-
-const GraphEl = styled.div`
-  height: calc(100% - 89px);
-`;
-
 const ErrorNote = styled.div`
   width: 80%;
   margin: auto;
-  padding: 1rem 2rem;
+  padding: 1rem;
   font-size: 1.25rem;
   color: var(--dark-red);
   text-align: center;
   background-color: var(--white);
   border: 1px solid var(--dark-red);
   position: relative;
-  top: 50%;
-  transform: translateY(-50%);
 `;
 
 const InfoNote = styled.div`
   width: 80%;
   margin: auto;
   text-align: center;
-  padding: 2rem;
+  padding: 1rem;
   background-color: var(--white);
   border: 1px solid var(--gray-300);
   position: relative;
-  top: 50%;
-  transform: translateY(-50%);
 `;
 
 export const DualAxisLineChart = (props: Props) => {
@@ -144,7 +131,7 @@ export const DualAxisLineChart = (props: Props) => {
       : (maxYearFiltered as number) - (minYearFiltered as number),
   );
   return (
-    <El>
+    <>
       <div style={{ padding: 'var(--spacing-06)', backgroundColor: 'var(--white)', borderBottom: '1px solid var(--gray-400)' }}>
         <Select
           showSearch
@@ -160,7 +147,7 @@ export const DualAxisLineChart = (props: Props) => {
           }
         </Select>
       </div>
-      <GraphEl>
+      <>
         {
           trendChartCountry && dataFilterd.length > 0
             ? (
@@ -473,10 +460,10 @@ export const DualAxisLineChart = (props: Props) => {
             </ErrorNote>
           ) : null
         }
-      </GraphEl>
+      </>
       {
         hoverData ? <Tooltip data={hoverData} /> : null
       }
-    </El>
+    </>
   );
 };
