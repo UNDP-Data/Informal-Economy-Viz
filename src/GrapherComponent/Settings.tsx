@@ -32,6 +32,7 @@ export const Settings = (props: Props) => {
     selectedIncomeGroups,
     selectedRegions,
     reverseOrder,
+    dataListCountry,
     updateSelectedCountryGroup,
     updateColorIndicator,
     updateXAxisIndicator,
@@ -48,6 +49,7 @@ export const Settings = (props: Props) => {
     updateReverseOrder,
     verticalBarLayout,
     updateBarLayout,
+    updateDataListCountry,
   } = useContext(Context) as CtxDataType;
   const options = graphType === 'scatterPlot'
     ? indicators.filter((d) => d.ScatterPlot).map((d) => d.IndicatorLabelTable)
@@ -75,32 +77,59 @@ export const Settings = (props: Props) => {
     <div className='undp-scrollbar settings-container'>
       <div className='settings-sections-container'>
         <div className='settings-sections-options-container'>
-          <div className='settings-option-div'>
-            <p className='label'>
-              {
-                graphType === 'scatterPlot'
-                  ? 'X-Axis'
-                  : graphType === 'map'
-                    ? 'Primary Indicator to color region'
-                    : 'Primary Indicator'
-              }
-            </p>
-            <Select
-              showSearch
-              maxTagCount='responsive'
-              className='undp-select'
-              placeholder='Please select'
-              value={xAxisIndicator}
-              onChange={(d) => { updateXAxisIndicator(d); }}
-              defaultValue={DEFAULT_VALUES.firstMetric}
-            >
-              {
-            options.map((d) => (
-              <Select.Option className='undp-select-option' key={d}>{d}</Select.Option>
-            ))
+          {
+            graphType !== 'dataList'
+              ? (
+                <div className='settings-option-div'>
+                  <p className='label'>
+                    {
+                  graphType === 'scatterPlot'
+                    ? 'X-Axis'
+                    : graphType === 'map'
+                      ? 'Primary Indicator to color region'
+                      : 'Primary Indicator'
+                }
+                  </p>
+                  <Select
+                    showSearch
+                    maxTagCount='responsive'
+                    className='undp-select'
+                    placeholder='Please select'
+                    value={xAxisIndicator}
+                    onChange={(d) => { updateXAxisIndicator(d); }}
+                    defaultValue={DEFAULT_VALUES.firstMetric}
+                  >
+                    {
+                  options.map((d) => (
+                    <Select.Option className='undp-select-option' key={d}>{d}</Select.Option>
+                  ))
+                }
+                  </Select>
+                </div>
+              )
+              : (
+                <>
+                  <div className='settings-option-div'>
+                    <p className='label'>
+                      Select a Country
+                    </p>
+                    <Select
+                      showSearch
+                      className='undp-select'
+                      placeholder='Please select a country'
+                      value={dataListCountry}
+                      onChange={(d) => { updateDataListCountry(d); }}
+                    >
+                      {
+                        countries.map((d) => d.name).map((d) => (
+                          <Select.Option className='undp-select-option' key={d}>{d}</Select.Option>
+                        ))
+                      }
+                    </Select>
+                  </div>
+                </>
+              )
           }
-            </Select>
-          </div>
           {
             graphType === 'scatterPlot'
               ? (
@@ -226,89 +255,98 @@ export const Settings = (props: Props) => {
                 </div>
               ) : null
           }
-          <div className='flex-div flex-wrap'>
-            <button className='undp-button button-primary' type='button' onClick={() => { updateShowSource(true); }}>Download Data</button>
-            <button
-              className='undp-button button-secondary'
-              type='button'
-              onClick={() => {
-                const node = document.getElementById('graph-node') as HTMLElement;
-                domtoimage
-                  .toPng(node, { height: node.scrollHeight })
-                  .then((dataUrl: any) => {
-                    const link = document.createElement('a');
-                    link.download = 'graph.png';
-                    link.href = dataUrl;
-                    link.click();
-                  });
-              }}
-            >
-              Download Graph
-            </button>
-          </div>
-        </div>
-      </div>
-      <div className='settings-sections-container'>
-        <button type='button' aria-label='Expand or collapse settings' className='settings-sections-container-title' onClick={() => { setSettingsExpanded(!settingExpanded); }}>
-          <div>
-            {
-              settingExpanded
-                ? <ChevronDown fill='#212121' size={18} /> : <ChevronLeft fill='#212121' size={18} />
-            }
-          </div>
-          <h6 className='undp-typography margin-bottom-00'>
-            Settings
-            {' '}
-            &
-            {' '}
-            Options
-          </h6>
-        </button>
-        <div className='settings-sections-options-container' style={{ display: settingExpanded ? 'flex' : 'none' }}>
           {
-            graphType !== 'trendLine' && graphType !== 'multiCountryTrendLine'
+            graphType !== 'dataList'
               ? (
-                <>
-                  {
-                    graphType === 'scatterPlot'
-                      ? (
-                        <Checkbox style={{ margin: 0 }} className='undp-checkbox' checked={showLabel} onChange={(e) => { updateShowLabel(e.target.checked); }}>Show Label</Checkbox>
-                      )
-                      : null
-                  }
-                  <Checkbox style={{ margin: 0 }} className='undp-checkbox' checked={showMostRecentData} onChange={(e) => { updateShowMostRecentData(e.target.checked); }}>Show Most Recent Available Data</Checkbox>
-                  {
-                    graphType === 'barGraph'
-                      ? (
-                        <>
-                          <Checkbox style={{ margin: 0 }} className='undp-checkbox' checked={!verticalBarLayout} onChange={(e) => { updateBarLayout(!e.target.checked); }}>Show Horizontal</Checkbox>
-                          <Checkbox style={{ margin: 0 }} className='undp-checkbox' disabled={!verticalBarLayout} checked={reverseOrder} onChange={(e) => { updateReverseOrder(e.target.checked); }}>Show Largest First</Checkbox>
-                        </>
-                      )
-                      : null
-                  }
-                </>
-              ) : null
-          }
-          {
-            graphType === 'trendLine'
-              ? (
-                <>
-                  <Checkbox style={{ margin: 0 }} className='undp-checkbox' checked={showLabel} onChange={(e) => { updateShowLabel(e.target.checked); }}>Show Label</Checkbox>
-                  <Checkbox style={{ margin: 0 }} className='undp-checkbox' checked={useSameRange} disabled={!yAxisIndicator} onChange={(e) => { updateUseSameRange(e.target.checked); }}>Use Same Range for Both Y-Axes</Checkbox>
-                </>
-              ) : null
-          }
-          {
-            graphType === 'multiCountryTrendLine'
-              ? (
-                <Checkbox style={{ margin: 0 }} className='undp-checkbox' checked={showLabel} onChange={(e) => { updateShowLabel(e.target.checked); }}>Show Label</Checkbox>
+                <div className='flex-div flex-wrap'>
+                  <button className='undp-button button-primary' type='button' onClick={() => { updateShowSource(true); }}>Download Data</button>
+                  <button
+                    className='undp-button button-secondary'
+                    type='button'
+                    onClick={() => {
+                      const node = document.getElementById('graph-node') as HTMLElement;
+                      domtoimage
+                        .toPng(node, { height: node.scrollHeight })
+                        .then((dataUrl: any) => {
+                          const link = document.createElement('a');
+                          link.download = 'graph.png';
+                          link.href = dataUrl;
+                          link.click();
+                        });
+                    }}
+                  >
+                    Download Graph
+                  </button>
+                </div>
               ) : null
           }
         </div>
       </div>
       {
-        graphType !== 'trendLine' && graphType !== 'multiCountryTrendLine'
+        graphType !== 'dataList' ? (
+          <div className='settings-sections-container'>
+            <button type='button' aria-label='Expand or collapse settings' className='settings-sections-container-title' onClick={() => { setSettingsExpanded(!settingExpanded); }}>
+              <div>
+                {
+                  settingExpanded
+                    ? <ChevronDown fill='#212121' size={18} /> : <ChevronLeft fill='#212121' size={18} />
+                }
+              </div>
+              <h6 className='undp-typography margin-bottom-00'>
+                Settings
+                {' '}
+                &
+                {' '}
+                Options
+              </h6>
+            </button>
+            <div className='settings-sections-options-container' style={{ display: settingExpanded ? 'flex' : 'none' }}>
+              {
+                graphType !== 'trendLine' && graphType !== 'multiCountryTrendLine'
+                  ? (
+                    <>
+                      {
+                        graphType === 'scatterPlot'
+                          ? (
+                            <Checkbox style={{ margin: 0 }} className='undp-checkbox' checked={showLabel} onChange={(e) => { updateShowLabel(e.target.checked); }}>Show Label</Checkbox>
+                          )
+                          : null
+                      }
+                      <Checkbox style={{ margin: 0 }} className='undp-checkbox' checked={showMostRecentData} onChange={(e) => { updateShowMostRecentData(e.target.checked); }}>Show Most Recent Available Data</Checkbox>
+                      {
+                        graphType === 'barGraph'
+                          ? (
+                            <>
+                              <Checkbox style={{ margin: 0 }} className='undp-checkbox' checked={!verticalBarLayout} onChange={(e) => { updateBarLayout(!e.target.checked); }}>Show Horizontal</Checkbox>
+                              <Checkbox style={{ margin: 0 }} className='undp-checkbox' disabled={!verticalBarLayout} checked={reverseOrder} onChange={(e) => { updateReverseOrder(e.target.checked); }}>Show Largest First</Checkbox>
+                            </>
+                          )
+                          : null
+                      }
+                    </>
+                  ) : null
+              }
+              {
+                graphType === 'trendLine'
+                  ? (
+                    <>
+                      <Checkbox style={{ margin: 0 }} className='undp-checkbox' checked={showLabel} onChange={(e) => { updateShowLabel(e.target.checked); }}>Show Label</Checkbox>
+                      <Checkbox style={{ margin: 0 }} className='undp-checkbox' checked={useSameRange} disabled={!yAxisIndicator} onChange={(e) => { updateUseSameRange(e.target.checked); }}>Use Same Range for Both Y-Axes</Checkbox>
+                    </>
+                  ) : null
+              }
+              {
+                graphType === 'multiCountryTrendLine'
+                  ? (
+                    <Checkbox style={{ margin: 0 }} className='undp-checkbox' checked={showLabel} onChange={(e) => { updateShowLabel(e.target.checked); }}>Show Label</Checkbox>
+                  ) : null
+              }
+            </div>
+          </div>
+        ) : null
+      }
+      {
+        graphType !== 'trendLine' && graphType !== 'multiCountryTrendLine' && graphType !== 'dataList'
           ? (
             <div className='settings-sections-container'>
               <button type='button' aria-label='Expand or collapse filters' className='settings-sections-container-title' onClick={() => { setFilterExpanded(!filterExpanded); }}>
@@ -394,10 +432,10 @@ export const Settings = (props: Props) => {
                     onChange={(d: string[]) => { updateSelectedCountries(d); updateMultiCountrytrendChartCountries(d); }}
                   >
                     {
-                    countries.map((d) => d.name).map((d) => (
-                      <Select.Option className='undp-select-option' key={d}>{d}</Select.Option>
-                    ))
-                  }
+                      countries.map((d) => d.name).map((d) => (
+                        <Select.Option className='undp-select-option' key={d}>{d}</Select.Option>
+                      ))
+                    }
                   </Select>
                 </div>
               </div>

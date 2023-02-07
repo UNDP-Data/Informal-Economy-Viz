@@ -47,6 +47,7 @@ const App = () => {
     showLabel: queryParams.get('showLabel') === 'true',
     showSource: false,
     trendChartCountry: queryParams.get('trendChartCountry') || undefined,
+    dataListCountry: queryParams.get('dataListsCountry') || undefined,
     multiCountrytrendChartCountries: queryParams.get('multiCountrytrendChartCountries')?.split('~') || ['China', 'India', 'United States of America', 'Indonesia', 'Pakistan'],
     useSameRange: queryParams.get('useSameRange') === 'true',
     reverseOrder: queryParams.get('reverseOrder') === 'true',
@@ -80,6 +81,13 @@ const App = () => {
     dispatch({
       type: 'UPDATE_TREND_CHART_COUNTRY',
       payload: trendChartCountry,
+    });
+  };
+
+  const updateDataListCountry = (dataListCountry: string) => {
+    dispatch({
+      type: 'UPDATE_DATA_LIST_COUNTRY',
+      payload: dataListCountry,
     });
   };
 
@@ -281,6 +289,7 @@ const App = () => {
                         updateShowLabel,
                         updateShowSource,
                         updateTrendChartCountry,
+                        updateDataListCountry,
                         updateMultiCountrytrendChartCountries,
                         updateUseSameRange,
                         updateReverseOrder,

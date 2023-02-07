@@ -105,11 +105,17 @@ export const GrapherComponent = (props: Props) => {
                           </IconEl>
                           <>Dual Axes Line Chart</>
                         </button>
-                        <button type='button' className={`tabs-for-graphing-interface${graphType === 'multiCountryTrendLine' ? ' multiCountryTrendLine' : ''}`} onClick={() => { updateGraphType('multiCountryTrendLine'); }}>
+                        <button type='button' className={`tabs-for-graphing-interface${graphType === 'multiCountryTrendLine' ? ' selected' : ''}`} onClick={() => { updateGraphType('multiCountryTrendLine'); }}>
                           <IconEl>
                             <MultiLineChartIcon size={48} fill={graphType === 'multiCountryTrendLine' ? 'var(--blue-600)' : 'var(--gray-500)'} />
                           </IconEl>
                           <>Multi Country Trends</>
+                        </button>
+                        <button type='button' className={`tabs-for-graphing-interface${graphType === 'dataList' ? ' selected' : ''}`} onClick={() => { updateGraphType('dataList'); }}>
+                          <IconEl>
+                            <DualAxesChartIcon size={48} fill={graphType === 'dataList' ? 'var(--blue-600)' : 'var(--gray-500)'} />
+                          </IconEl>
+                          <>Data List</>
                         </button>
                       </div>
                     )

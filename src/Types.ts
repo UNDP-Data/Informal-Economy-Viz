@@ -83,7 +83,7 @@ export interface HoverDataType {
 }
 
 export interface CtxDataType {
-  graphType: 'scatterPlot' | 'map' | 'barGraph' | 'trendLine' | 'multiCountryTrendLine' ;
+  graphType: 'scatterPlot' | 'map' | 'barGraph' | 'trendLine' | 'multiCountryTrendLine' | 'dataList';
   selectedRegions: string[];
   selectedCountries: string[];
   selectedIncomeGroups: string[];
@@ -97,11 +97,12 @@ export interface CtxDataType {
   showLabel: boolean;
   showSource: boolean;
   trendChartCountry: undefined | string;
+  dataListCountry: undefined | string;
   multiCountrytrendChartCountries: string[];
   useSameRange: boolean;
   reverseOrder: boolean;
   verticalBarLayout: boolean;
-  updateGraphType: (_d: 'scatterPlot' | 'map' | 'barGraph' | 'trendLine' | 'multiCountryTrendLine') => void;
+  updateGraphType: (_d: 'scatterPlot' | 'map' | 'barGraph' | 'trendLine' | 'multiCountryTrendLine' | 'dataList') => void;
   updateSelectedRegions: (_d: string[]) => void;
   updateSelectedCountries: (_d: string[]) => void;
   updateSelectedIncomeGroups: (_d: string[]) => void;
@@ -117,6 +118,7 @@ export interface CtxDataType {
   updateUseSameRange: (_d: boolean) => void;
   updateReverseOrder: (_d: boolean) => void;
   updateTrendChartCountry: (_d: string) => void;
+  updateDataListCountry: (_d: string) => void;
   updateMultiCountrytrendChartCountries: (_d: string[]) => void;
   updateBarLayout: (_d: boolean) => void;
 }

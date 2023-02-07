@@ -16,6 +16,7 @@ import { MultiLineChart } from './MultiLineChart';
 import { BarChart } from './BarChart';
 import { LineChart } from './LineChart';
 import { PauseIcon, PlayIcon } from '../Icons';
+import { DataList } from './DataList';
 
 interface Props {
   data: CountryGroupDataType[];
@@ -106,10 +107,10 @@ export const Graph = (props: Props) => {
   return (
     <div
       id='graph-node'
-      className={`undp-scrollbar graph-el${graphType !== 'barGraph' ? ' no-overflow' : ''}`}
+      className={`undp-scrollbar graph-el${graphType !== 'barGraph' && graphType !== 'dataList' ? ' no-overflow' : ''}`}
     >
       {
-        graphType === 'trendLine' || graphType === 'multiCountryTrendLine' ? null
+        graphType === 'trendLine' || graphType === 'multiCountryTrendLine' || graphType === 'dataList' ? null
           : commonYears.length > 1 && !showMostRecentData ? (
             <div className='slider-background'>
               <button className='undp-button button-no-background' type='button' aria-label='Click to play or stop time animation' onClick={() => { setPlay(!play); }}>
@@ -200,13 +201,21 @@ export const Graph = (props: Props) => {
                         countries={countries}
                       />
                     )
-                  : (
-                    <MultiLineChart
-                      data={data}
-                      indicators={indicators}
-                      countries={countries}
-                    />
-                  )
+                  : graphType === 'dataList'
+                    ? (
+                      <DataList
+                        data={data}
+                        indicators={indicators}
+                        countries={countries}
+                      />
+                    )
+                    : (
+                      <MultiLineChart
+                        data={data}
+                        indicators={indicators}
+                        countries={countries}
+                      />
+                    )
 
         }
       </>
