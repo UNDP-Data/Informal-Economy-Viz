@@ -6,6 +6,7 @@ import uniqBy from 'lodash.uniqby';
 import { queue } from 'd3-queue';
 import flattenDeep from 'lodash.flattendeep';
 import sortedUniq from 'lodash.sorteduniq';
+import UNDPColorModule from 'undp-viz-colors';
 import {
   CountryGroupDataType, CountryListType, IndicatorMetaDataType, IndicatorMetaDataWithYear,
 } from './Types';
@@ -238,26 +239,26 @@ const App = () => {
                     <MultiDonutChartCard
                       data={[66, 58.1]}
                       keys={['Male', 'Female']}
-                      colors={['#00C4AA', '#8700F9']}
+                      colors={[UNDPColorModule.categoricalColors.genderColors.male, UNDPColorModule.categoricalColors.genderColors.female]}
                       titleText='Gender'
                     />
                     <MultiDonutChartCard
                       data={[77.1, 58.7]}
                       keys={['15-24 Yrs', '25+ Yrs']}
                       titleText='Age'
-                      colors={['#41b6c4', '#253494']}
+                      colors={[UNDPColorModule.categoricalColors.colors[0], UNDPColorModule.categoricalColors.colors[1]]}
                     />
                     <MultiDonutChartCard
                       data={[93.8, 84.6, 51.7, 23.8]}
                       keys={['No Edu.', 'Primary', 'Secondary', 'Tertiary']}
                       titleText='Education'
-                      colors={['#d7191c', '#fdae61', '#abdda4', '#2b83ba']}
+                      colors={UNDPColorModule.divergentColors.colorsx04}
                     />
                     <MultiDonutChartCard
                       data={[80, 43.7]}
                       keys={['Rural', 'Urban']}
                       titleText='Area of Residence'
-                      colors={['#4daf4a', '#377eb8']}
+                      colors={[UNDPColorModule.categoricalColors.locationColors.rural, UNDPColorModule.categoricalColors.locationColors.urban]}
                     />
                   </div>
                 </div>
